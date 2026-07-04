@@ -1,4 +1,5 @@
-# AI From Scratch — Ajay's Curriculum
+# AI From Scratch — Learner's Curriculum
+
 > Combined from personal tutoring plan + rohitg00/ai-engineering-from-scratch (503 lessons, 20 phases)
 > Cross-references included per topic — no manual checking needed.
 
@@ -9,6 +10,7 @@
 ---
 
 ## What "from scratch" means here (read this)
+
 Literal: model, training loop, backprop, attention — written in raw Python/NumPy by you.
 
 - **NumPy** = allowed. It's just fast arithmetic, not thinking-for-you.
@@ -18,20 +20,23 @@ Literal: model, training loop, backprop, attention — written in raw Python/Num
 ---
 
 ## Note to self (Claude): documentation rule
+
 After every topic, before moving on:
+
 1. Tick the checkbox `[x]`
 2. Add a one-line dated entry to the **Progress Log**
 3. Append a full entry to that phase's file in `notes/` (concept + worked example + key code + gotchas)
-4. Note the repo cross-reference so Ajay can read their angle as a second pass
+4. Note the repo cross-reference so the Learner can read their angle as a second pass
 
 Never write detailed notes inline in this tracker. It stays an index.
 
 ---
 
 ## Tutor-mode instructions (read at the start of every session)
-1. **Check this file first** — find first unchecked box. If Ajay says "where are we," answer from here directly.
-2. **Teaching order per topic always**: (a) plain-language concept, (b) worked numeric example with real numbers, (c) map math to code line-by-line, (d) Ajay writes and runs it in VS Code, (e) predict-then-verify question before moving on.
-3. **Never skip ahead** unless Ajay explicitly asks.
+
+1. **Check this file first** — find first unchecked box. If Learner says "where are we," answer from here directly.
+2. **Teaching order per topic always**: (a) plain-language concept, (b) worked numeric example with real numbers, (c) map math to code line-by-line, (d) Learner writes and runs it in VS Code, (e) predict-then-verify question before moving on.
+3. **Never skip ahead** unless Learner explicitly asks.
 4. **Enforce from-scratch rule** — no frameworks until Phase 5+.
 5. **After each topic**: tick box, log entry, notes file entry — before next topic.
 6. **Sessions end at clean checkpoints** — one topic fully closed, not mid-explanation.
@@ -42,8 +47,10 @@ Never write detailed notes inline in this tracker. It stays an index.
 ---
 
 ## Git commit conventions
+
 Format: `Phase X.Y: <what was built>`
 Examples:
+
 - `Phase 0.1: algebra and functions from scratch`
 - `Phase 2.2: linear regression hand-coded, no libraries`
 - `Phase 3.5: autograd engine (micrograd-style)`
@@ -54,6 +61,7 @@ Commit once per topic, after code runs and concept clicked — not mid-debug.
 ---
 
 ## Folder structure
+
 ```
 ai-from-scratch/
 ├── ai-curriculum.md              # this file — index only
@@ -95,41 +103,46 @@ ai-from-scratch/
 ---
 
 ## Phase 0 — Setup & Environment
-*Get the machine ready before any math or code.*
+
+_Get the machine ready before any math or code._
 → repo: `phases/00-setup-and-tooling/`
 
 - [x] **0.1** Python environment (venv, pip, folder structure)
 - [x] **0.2** VS Code setup (Python + Jupyter extensions, linting)
 - [x] **0.3** Git basics — init, commit, log, branch (used every session from here)
 - [x] **0.4** Jupyter notebooks — when to use vs plain `.py`
-- [ ] **0.5** GPU setup & cloud basics (Google Colab as fallback when compute needed)
-- [ ] **0.6** Docker for AI — containers for reproducibility (intro only, used in Phase 8)
-- [ ] **0.7** Data management basics — file formats (CSV, JSON, Parquet), folder conventions
-- [ ] **0.8** Debugging & profiling Python — `pdb`, `cProfile`, `line_profiler`
+- [x] **0.5** GPU setup & cloud basics (Google Colab as fallback when compute needed)
+- [x] **0.6** Docker for AI — containers for reproducibility (intro only, used in Phase 8)
+- [x] **0.7** Data management basics — file formats (CSV, JSON, Parquet), folder conventions
+- [x] **0.8** Debugging & profiling Python — `pdb`, `cProfile`, `line_profiler`
 
 ---
 
 ## Phase 1 — Math Foundations (rebuild from zero)
-*Every concept explained with real numbers before any code.*
+
+_Every concept explained with real numbers before any code._
 → repo: `phases/01-math-foundations/`
 
 ### 1.1 Algebra
+
 - [ ] **1.1.1** Variables, expressions, solving for x
 - [ ] **1.1.2** Functions: what `f(x)` means, domain, range
 - [ ] **1.1.3** Graphing lines: slope, intercept (`y = mx + b`)
 - [ ] **1.1.4** Exponents and logarithms — why `log` is everywhere in ML
-  → repo: `01-linear-algebra-intuition`
+      → repo: `01-linear-algebra-intuition`
 
 ### 1.2 Calculus
+
 - [ ] **1.2.1** What a derivative is — rate of change, slope of a curve, numeric intuition
 - [ ] **1.2.2** Derivative rules: power rule, chain rule — worked examples by hand
 - [ ] **1.2.3** Partial derivatives — multi-variable functions
 - [ ] **1.2.4** Gradients — vector of partial derivatives, what "gradient descent" literally means
 - [ ] **1.2.5** Optimization — minimizing a function, why we move against the gradient
 - [ ] **1.2.6** Convex vs non-convex functions — why it matters for training
-  → repo: `04-calculus-for-ml`, `05-chain-rule-and-autodiff`, `18-convex-optimization`
+      → repo: `04-calculus-for-ml`, `05-chain-rule-and-autodiff`, `18-convex-optimization`
 
 ### 1.3 Linear Algebra
+
 - [ ] **1.3.1** Vectors — what they are, addition, scaling, geometric intuition
 - [ ] **1.3.2** Dot product — computed by hand, geometric meaning (angle, similarity)
 - [ ] **1.3.3** Matrices — what they represent, shapes, notation
@@ -142,9 +155,10 @@ ai-from-scratch/
 - [ ] **1.3.10** Dimensionality reduction — PCA from scratch, t-SNE/UMAP concept
 - [ ] **1.3.11** Linear systems — solving Ax = b
 - [ ] **1.3.12** Numerical stability — why floating point errors matter in deep learning
-  → repo: `02-vectors-matrices-operations`, `03-matrix-transformations`, `11-svd`, `12-tensor-operations`, `13-numerical-stability`, `14-norms-and-distances`, `10-dimensionality-reduction`, `17-linear-systems`
+      → repo: `02-vectors-matrices-operations`, `03-matrix-transformations`, `11-svd`, `12-tensor-operations`, `13-numerical-stability`, `14-norms-and-distances`, `10-dimensionality-reduction`, `17-linear-systems`
 
 ### 1.4 Probability & Statistics
+
 - [ ] **1.4.1** Mean, variance, standard deviation — by hand on a small dataset
 - [ ] **1.4.2** Probability basics — events, independence, combinations
 - [ ] **1.4.3** Bayes' theorem — worked example, why it's foundational
@@ -152,25 +166,28 @@ ai-from-scratch/
 - [ ] **1.4.5** Expected value — definition + worked example
 - [ ] **1.4.6** Sampling methods — Monte Carlo basics, why we sample instead of compute exactly
 - [ ] **1.4.7** Statistics for ML — bias, variance, confidence intervals, hypothesis testing
-  → repo: `06-probability-and-distributions`, `07-bayes-theorem`, `15-statistics-for-ml`, `16-sampling-methods`
+      → repo: `06-probability-and-distributions`, `07-bayes-theorem`, `15-statistics-for-ml`, `16-sampling-methods`
 
 ### 1.5 Information Theory
+
 - [ ] **1.5.1** Entropy — what it measures, why it appears in loss functions
 - [ ] **1.5.2** KL Divergence — measuring distance between distributions
 - [ ] **1.5.3** Cross-entropy loss — derived from information theory, used in classification
-  → repo: `09-information-theory`
+      → repo: `09-information-theory`
 
 ### 1.6 Advanced Math (deferred, covered when domain needs it)
+
 - [ ] **1.6.1** Complex numbers for AI (relevant for Fourier, signal processing)
 - [ ] **1.6.2** Fourier Transform — frequency domain, why audio/signal AI needs this
 - [ ] **1.6.3** Graph theory for ML — nodes, edges, adjacency, relevance to GNNs
 - [ ] **1.6.4** Stochastic processes — random walks, Markov chains (relevant for diffusion & RL)
-  → repo: `19-complex-numbers`, `20-fourier-transform`, `21-graph-theory`, `22-stochastic-processes`
+      → repo: `19-complex-numbers`, `20-fourier-transform`, `21-graph-theory`, `22-stochastic-processes`
 
 ---
 
 ## Phase 2 — ML Fundamentals (hands-on, no frameworks)
-*Classical ML — still the backbone of most production AI.*
+
+_Classical ML — still the backbone of most production AI._
 → repo: `phases/02-ml-fundamentals/`
 
 - [ ] **2.1** What machine learning actually is — map from data to prediction, types (supervised/unsupervised/RL)
@@ -192,12 +209,13 @@ ai-from-scratch/
 - [ ] **2.17** Time series fundamentals — stationarity, autocorrelation, ARIMA concept
 - [ ] **2.18** Anomaly detection — isolation forest, statistical methods
 - [ ] **2.19** Handling imbalanced data — oversampling, undersampling, class weights
-  → repo: `01` through `18` lessons in `phases/02-ml-fundamentals/`
+      → repo: `01` through `18` lessons in `phases/02-ml-fundamentals/`
 
 ---
 
 ## Phase 3 — Deep Learning Core (from scratch, no autograd)
-*Neural networks built by hand. Frameworks don't appear until lesson 3.11.*
+
+_Neural networks built by hand. Frameworks don't appear until lesson 3.11._
 → repo: `phases/03-deep-learning-core/`
 
 - [ ] **3.1** The perceptron — simplest neural net, by hand, with worked numbers
@@ -215,12 +233,13 @@ ai-from-scratch/
 - [ ] **3.13** Debugging neural networks — vanishing gradients, exploding gradients, dead ReLUs
 - [ ] **3.14** Intro to PyTorch — rebuild your hand-built net, see exactly what it automates
 - [ ] **3.15** Intro to JAX — functional approach, `jit`, `grad` (conceptual awareness)
-  → repo: `01` through `13` lessons in `phases/03-deep-learning-core/`
+      → repo: `01` through `13` lessons in `phases/03-deep-learning-core/`
 
 ---
 
 ## Phase 4 — Neural Net Milestones (language models from scratch)
-*The payoff of Phase 3 — real working models, all hand-coded.*
+
+_The payoff of Phase 3 — real working models, all hand-coded._
 
 - [ ] **4.1** Character-level language model (makemore-style) — bigram model from scratch
 - [ ] **4.2** MLP-based language model — context window, embedding table, from scratch
@@ -232,14 +251,16 @@ ai-from-scratch/
 - [ ] **4.8** **Build nanoGPT from scratch** — your own tokenizer, attention, training loop, trained on real text
 - [ ] **4.9** BERT-style masked language modeling — encoder-only variant
 - [ ] **4.10** Scaling intuition — how bigger models/data/compute interact (Chinchilla laws)
-  → repo: `phases/05-nlp-foundations-to-advanced/03-word-embeddings`, `phases/07-transformers-deep-dive/`
+      → repo: `phases/05-nlp-foundations-to-advanced/03-word-embeddings`, `phases/07-transformers-deep-dive/`
 
 ---
 
 ## Phase 5 — Domain Branches
-*Same rule: hand-build the core mechanism on a toy example first, library second.*
+
+_Same rule: hand-build the core mechanism on a toy example first, library second._
 
 ### 5A — Computer Vision
+
 → repo: `phases/04-computer-vision/`
 
 - [ ] **5A.1** Image fundamentals — pixels, channels, color spaces, convolution by hand
@@ -259,6 +280,7 @@ ai-from-scratch/
 - [ ] **5A.15** Build a complete vision pipeline — capstone
 
 ### 5B — NLP (pre-transformer foundations)
+
 → repo: `phases/05-nlp-foundations-to-advanced/`
 
 - [ ] **5B.1** Text processing — tokenization, stemming, lemmatization by hand
@@ -274,6 +296,7 @@ ai-from-scratch/
 - [ ] **5B.11** Structured outputs & constrained decoding
 
 ### 5C — Speech & Audio
+
 → repo: `phases/06-speech-and-audio/`
 
 - [ ] **5C.1** Audio fundamentals — waveforms, sampling rate, FFT by hand
@@ -290,6 +313,7 @@ ai-from-scratch/
 - [ ] **5C.12** Build a voice assistant pipeline — capstone
 
 ### 5D — Generative AI
+
 → repo: `phases/08-generative-ai/`
 
 - [ ] **5D.1** Generative model taxonomy — VAEs, GANs, diffusion, flow — the big picture
@@ -305,6 +329,7 @@ ai-from-scratch/
 - [ ] **5D.11** Evaluation — FID, CLIP Score, how to measure generative quality
 
 ### 5E — Reinforcement Learning
+
 → repo: `phases/09-reinforcement-learning/`
 
 - [ ] **5E.1** MDPs, states, actions, rewards — from scratch with toy gridworld
@@ -322,6 +347,7 @@ ai-from-scratch/
 ---
 
 ## Phase 6 — LLMs from Scratch & Transformers Deep Dive
+
 → repo: `phases/07-transformers-deep-dive/` + `phases/10-llms-from-scratch/`
 
 - [ ] **6.1** Why transformers replaced RNNs — the quadratic tradeoff
@@ -343,7 +369,8 @@ ai-from-scratch/
 ---
 
 ## Phase 6.5 — Frontier / Beyond-Transformer (2025-2026 research)
-*The field has moved past "transformer = AI" — these are the active directions.*
+
+_The field has moved past "transformer = AI" — these are the active directions._
 
 - [ ] **6.5.1** Why transformers hit limits — quadratic attention, fixed context, frozen weights post-training
 - [ ] **6.5.2** State-Space Models (Mamba, SSMs) — linear-time alternative to attention, from scratch
@@ -357,6 +384,7 @@ ai-from-scratch/
 ---
 
 ## Phase 7 — Multimodal AI
+
 → repo: `phases/12-multimodal-ai/`
 
 - [ ] **7.1** Vision-Language Models (ViT-MLP-LLM) — BLIP-2, LLaVA architecture
@@ -372,6 +400,7 @@ ai-from-scratch/
 ---
 
 ## Phase 8 — LLM Engineering & RAG
+
 → repo: `phases/11-llm-engineering/`
 
 - [ ] **8.1** Prompt engineering — techniques, patterns, CoT, Tree-of-Thought
@@ -391,9 +420,11 @@ ai-from-scratch/
 ---
 
 ## Phase 9 — Tools, Protocols & Agent Engineering
+
 → repo: `phases/13-tools-and-protocols/` + `phases/14-agent-engineering/`
 
 ### 9A — MCP & Tool Protocols
+
 - [ ] **9A.1** The tool interface — how models call external tools
 - [ ] **9A.2** Function calling deep dive — schema design, parallel calls
 - [ ] **9A.3** MCP fundamentals — what it is, why it exists
@@ -405,6 +436,7 @@ ai-from-scratch/
 - [ ] **9A.9** OpenTelemetry for GenAI — observability
 
 ### 9B — Agent Engineering
+
 - [ ] **9B.1** The agent loop — 120 lines of pure Python, no frameworks
 - [ ] **9B.2** ReAct, ReWOO, Plan-and-Execute patterns
 - [ ] **9B.3** Reflexion & verbal reinforcement learning
@@ -422,6 +454,7 @@ ai-from-scratch/
 ---
 
 ## Phase 10 — Autonomous Systems & Multi-Agent Swarms
+
 → repo: `phases/15-autonomous-systems/` + `phases/16-multi-agent-and-swarms/`
 
 - [ ] **10.1** Long-horizon agents — METR time horizons
@@ -440,6 +473,7 @@ ai-from-scratch/
 ---
 
 ## Phase 11 — Infrastructure, Production & Ethics
+
 → repo: `phases/17-infrastructure-and-production/` + `phases/18-ethics-and-alignment/`
 
 - [ ] **11.1** Model serving — vLLM, ONNX Runtime, FastAPI wrapper
@@ -456,6 +490,7 @@ ai-from-scratch/
 ---
 
 ## Phase 12 — Capstone Projects
+
 → repo: `phases/19-capstone-projects/`
 
 - [ ] **12.1** Train a small LLM on your own domain data (custom tokenizer, custom dataset, full pipeline)
@@ -468,29 +503,32 @@ ai-from-scratch/
 ---
 
 ## Tooling Reference (verified June 2026)
-| Purpose | Tool |
-|---|---|
-| Primary framework (learned after hand-build) | PyTorch |
-| Pre-trained models / fine-tuning | Hugging Face Transformers + Diffusers |
-| Classical ML | scikit-learn |
-| Agent / RAG frameworks | LangChain, LangGraph, LlamaIndex |
-| LLM serving | vLLM, ONNX Runtime |
-| Experiment tracking | Weights & Biases, MLflow |
-| Containerisation | Docker |
-| IDE | VS Code (Python + Jupyter extensions) |
-| Second-pass reference | rohitg00/ai-engineering-from-scratch |
+
+| Purpose                                      | Tool                                  |
+| -------------------------------------------- | ------------------------------------- |
+| Primary framework (learned after hand-build) | PyTorch                               |
+| Pre-trained models / fine-tuning             | Hugging Face Transformers + Diffusers |
+| Classical ML                                 | scikit-learn                          |
+| Agent / RAG frameworks                       | LangChain, LangGraph, LlamaIndex      |
+| LLM serving                                  | vLLM, ONNX Runtime                    |
+| Experiment tracking                          | Weights & Biases, MLflow              |
+| Containerisation                             | Docker                                |
+| IDE                                          | VS Code (Python + Jupyter extensions) |
+| Second-pass reference                        | rohitg00/ai-engineering-from-scratch  |
 
 ---
 
 ## Progress Log
+
 - **2026-06-19**: Curriculum created. Starting point confirmed zero across math and ML.
 - **2026-06-19**: Cross-verified against current (June 2026) research. Added frontier topics, tooling reference.
 - **2026-06-19**: Clarified "from scratch" philosophy. Phase 3 includes own autograd engine.
 - **2026-06-19**: Full merge with rohitg00/ai-engineering-from-scratch (503 lessons, 20 phases). Repo cross-references added per topic throughout. All missing topics incorporated: information theory, Fourier, graph theory, SVMs, KNN, anomaly detection, time series, Word2Vec, RNNs, GANs, VAEs, voice cloning, MCP deep dive (23 lessons), agent engineering (42 lessons), autonomous systems, multi-agent swarms, ethics/alignment, capstone projects.
-- **2026-06-19**: Lesson 0.1 complete — venv setup, numpy 2.5.0 / matplotlib 3.11.0 / jupyter installed on Windows, Python 3.14.3. Tool workflow established: VS Code + `# %%` for lessons, Jupyter for exploration (Phase 2+), Colab for GPU (Phase 3+).
+- **2026-07-04**: Phase 0 complete — all 8 setup lessons done. Environment solid: Python 3.14.3, venv, numpy 2.5.0, matplotlib 3.11.0, jupyter, VS Code configured, RTX 2060 GPU confirmed (CUDA 13.2), Docker and data management understood conceptually, debugging/profiling tools covered. Starting Phase 1 (Math Foundations) next session.
 
 ---
 
 ## Lesson Notes
+
 Detailed notes live in `notes/` folder, one file per phase. Append after each completed topic.
 First entry will appear in `notes/phase0-setup.md` after Lesson 0.1.

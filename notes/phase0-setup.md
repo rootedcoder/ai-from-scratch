@@ -37,7 +37,7 @@ pip freeze > requirements.txt
 - `jupyter` — notebook environment. Industry standard for exploration and sharing ML work
 - `ipykernel` — lets VS Code talk to Jupyter notebooks inside the editor
 
-### Verified versions (Ajay's machine)
+### Verified versions (Development machine)
 
 - Python 3.14.3
 - numpy 2.5.0
@@ -229,3 +229,270 @@ Jupyter notebooks store outputs inside the `.ipynb` JSON file — this makes git
 ### Git commit
 
 `Phase 0.4: Jupyter setup verified, notebook basics covered`
+
+---
+
+## Lesson 0.5 — GPU Setup & Google Colab
+
+**Date:** 2026-07-04
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### Why GPUs matter
+
+CPUs execute tasks sequentially — fast per task but one at a time.
+GPUs have thousands of smaller cores running simple calculations in parallel simultaneously.
+Training = millions of matrix multiplications — GPUs are built exactly for this.
+
+| Hardware | Training time    |
+| -------- | ---------------- |
+| CPU      | Hours to days    |
+| GPU      | Minutes to hours |
+
+CPU is fine for Phases 0-2. GPU needed from Phase 3 onwards.
+
+### Used GPU
+
+- **GPU**: NVIDIA GeForce RTX 2060
+- **VRAM**: 6GB
+- **CUDA Version**: 13.2
+- **Driver**: 596.21
+
+**6GB VRAM is sufficient for:**
+
+- All neural net from-scratch work (Phase 3-4)
+- Small GPT training (Phase 4)
+- LoRA/QLoRA fine-tuning (Phase 5+)
+- Vision, audio, diffusion experiments on small datasets
+
+**Not sufficient for:** training large LLMs (70B+ params) — use Colab or cloud for those.
+
+### PyTorch GPU setup (deferred to Phase 3)
+
+When installing PyTorch, install the CUDA-enabled version:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+```
+
+This tells PyTorch to use the RTX 2060 automatically.
+
+### Google Colab (backup for >6GB jobs)
+
+- Go to colab.research.google.com
+- Runtime → Change Runtime Type → T4 GPU → Save
+- Free, browser-based, no install needed
+- Limitation: sessions timeout after ~12 hours, no persistent storage
+
+### Git commit
+
+`Phase 0.5: GPU setup verified (RTX 2060, 6GB VRAM, CUDA 13.2), Colab configured`
+
+### Key concepts clarified during 0.5
+
+**What is CUDA?**
+CUDA (Compute Unified Device Architecture) = NVIDIA's bridge between Python code and GPU cores.
+Without CUDA: PyTorch uses CPU only.
+With CUDA: PyTorch offloads matrix math to GPU automatically.
+
+```
+Your Python code → PyTorch → CUDA → RTX 2060
+```
+
+**What is PyTorch? (preview — covered properly in Phase 3.14)**
+Two things:
+
+1. Fast tensor math on GPU via CUDA
+2. Automatic differentiation (autograd) — calculates gradients automatically via `.backward()`
+
+We build both of these ourselves first in Phase 3, THEN use PyTorch so it's never a black box.
+
+**Different GPUs need different bridges:**
+| GPU Brand | Bridge | PyTorch support |
+|---|---|---|
+| NVIDIA | CUDA | Best — 15+ years, industry standard |
+| AMD | ROCm | Good but patchier |
+| Apple M1/M2 | MPS (Metal) | Added 2022, works well |
+| Intel | oneAPI | Newest, least mature |
+
+NVIDIA dominates ML not just for raw performance but because CUDA has a massive ecosystem head start — every ML library was built CUDA-first.
+
+**Why hand-built autograd still runs on CPU (Phase 3):**
+Pure Python/NumPy doesn't speak CUDA. But that's fine — hand-built nets are tiny (2 layers, ~50 neurons), CPU runs them in milliseconds. GPU only becomes essential in Phase 4 when training real models on real data.
+
+"From scratch" means building the math and logic yourself — not rewriting CUDA drivers. Nobody does that, not even Google or Meta.
+
+---
+
+## Lesson 0.6 — Docker for AI (Intro Only)
+
+**Date:** 2026-07-04
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### The problem Docker solves
+
+venv solves Python library isolation but doesn't cover:
+
+- The OS itself
+- System-level dependencies
+- CUDA driver versions
+- Other software the project needs
+
+Result without Docker: works on your machine, breaks on every other machine.
+
+### What Docker does
+
+Packages the entire environment into a container:
+
+```
+Docker Container
+├── OS layer (e.g. Ubuntu 22.04)
+├── CUDA drivers (specific version)
+├── Python 3.11
+├── numpy 2.5.0
+├── your code
+└── everything else needed
+```
+
+Runs identically on any machine with Docker installed.
+
+### venv vs Docker (Ajay's own words — correct)
+
+"venv is a Python virtual environment tool used to create one locally and packages are installed within that environment, but it doesn't control the OS version and CUDA drivers. To overcome this, Docker is used, where it creates an optimal environment for the model to run — starting from package version match to OS version including CUDA drivers version optimal for PyTorch. This Docker container can be shipped anywhere and run without any extra configuration."
+
+### When Docker appears in this curriculum
+
+- Phase 0-4: not needed — local dev, venv is enough
+- Phase 11: deploy trained model — Docker packages it for any server
+- Phase 12: capstone projects — production-ready containers
+
+### Git commit
+
+`Phase 0.6: Docker intro — concept understood, hands-on deferred to Phase 11`
+
+---
+
+## Lesson 0.7 — Data Management Basics
+
+**Date:** 2026-07-04
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### Three file formats in ML
+
+**CSV** — small tabular data, human readable, slow at scale
+
+```
+age,salary,hired
+25,50000,1
+30,75000,1
+```
+
+Used for: classic ML datasets (Phase 2), features and labels
+
+**JSON** — configs and structured metadata
+
+```json
+{ "layers": 6, "learning_rate": 0.001 }
+```
+
+Used for: model configs, hyperparameters, tokenizer vocab, API responses
+
+**Parquet** — large datasets, binary, compressed, 10-100x faster than CSV
+Used for: large training datasets, production pipelines (Phase 6+)
+
+### Standard ML folder structure
+
+```
+project/
+├── data/
+│   ├── raw/          # original data — never touch
+│   ├── processed/    # cleaned/transformed copy
+│   └── splits/       # train, val, test splits
+├── models/           # saved weights
+├── notebooks/        # exploration
+├── src/              # source code
+└── configs/          # hyperparameter configs
+```
+
+### Why never modify raw data
+
+Raw data = source of truth. If processing script corrupts it and original is gone:
+
+- Can't debug whether problem was in data or code
+- Can't rerun processing from clean starting point
+- Can't compare processed vs raw to verify cleaning worked
+- Have to re-download the entire dataset
+
+Same principle as React — never mutate state directly, work on a copy.
+Raw data is immutable. Processing scripts are rerunnable. That's the invariant.
+
+### Two rules
+
+1. Never modify raw data — always work on a processed copy
+2. Never commit data to git — too large, already in `.gitignore`
+
+### Git commit
+
+Combined with 0.8 at end of Phase 0
+
+---
+
+## Lesson 0.8 — Debugging & Profiling Python
+
+**Date:** 2026-07-04
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### Debugging — pdb (Python Debugger)
+
+Python's built-in debugger. Pauses execution at a line and gives an interactive prompt to inspect state at runtime.
+
+```python
+import pdb; pdb.set_trace()  # drop anywhere, pauses here
+```
+
+**Key commands:**
+| Command | Action |
+|---|---|
+| `n` | Next line |
+| `s` | Step into function |
+| `c` | Continue to next breakpoint |
+| `p variable` | Print variable value |
+| `q` | Quit debugger |
+
+**In VS Code:** click red dot left of line number → set breakpoint → F5 to run in debug mode. Same concept, visual interface.
+
+**Bonus capability:** can change variable values mid-execution to test a fix without restarting. Critical in ML — if loss explodes at step 500, pause there, inspect tensors, tweak, continue without rerunning 500 steps.
+
+### print() vs pdb
+
+`print()` = add statements, run, read output, change code, run again. Slow feedback loop, requires code changes.
+`pdb` = pause at runtime, inspect any variable interactively, step line by line, no code changes needed. Same reason browser DevTools is better than `console.log` everywhere.
+
+### Profiling — finding what's slow
+
+**`cProfile`** — built-in, time per function:
+
+```bash
+python -m cProfile -s cumtime your_script.py
+```
+
+**`line_profiler`** — time per line inside a specific function:
+
+```bash
+pip install line_profiler
+kernprof -l -v your_script.py
+```
+
+Add `@profile` decorator to the function you want to measure.
+
+### When to use what
+
+| Tool                | When                                                |
+| ------------------- | --------------------------------------------------- |
+| VS Code breakpoints | Daily — any bug while writing code                  |
+| `pdb`               | Running scripts outside VS Code                     |
+| `cProfile`          | Training loop slower than expected                  |
+| `line_profiler`     | Know which function is slow, want line-level detail |
+
+### Git commit
+
+`Phase 0.8: debugging and profiling concepts covered — Phase 0 complete`
