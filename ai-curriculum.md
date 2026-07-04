@@ -98,7 +98,7 @@ ai-from-scratch/
 *Get the machine ready before any math or code.*
 → repo: `phases/00-setup-and-tooling/`
 
-- [ ] **0.1** Python environment (venv, pip, folder structure)
+- [x] **0.1** Python environment (venv, pip, folder structure)
 - [ ] **0.2** VS Code setup (Python + Jupyter extensions, linting)
 - [ ] **0.3** Git basics — init, commit, log, branch (used every session from here)
 - [ ] **0.4** Jupyter notebooks — when to use vs plain `.py`
@@ -487,6 +487,7 @@ ai-from-scratch/
 - **2026-06-19**: Cross-verified against current (June 2026) research. Added frontier topics, tooling reference.
 - **2026-06-19**: Clarified "from scratch" philosophy. Phase 3 includes own autograd engine.
 - **2026-06-19**: Full merge with rohitg00/ai-engineering-from-scratch (503 lessons, 20 phases). Repo cross-references added per topic throughout. All missing topics incorporated: information theory, Fourier, graph theory, SVMs, KNN, anomaly detection, time series, Word2Vec, RNNs, GANs, VAEs, voice cloning, MCP deep dive (23 lessons), agent engineering (42 lessons), autonomous systems, multi-agent swarms, ethics/alignment, capstone projects.
+- **2026-06-19**: Lesson 0.1 complete — venv setup, numpy 2.5.0 / matplotlib 3.11.0 / jupyter installed on Windows, Python 3.14.3. Tool workflow established: VS Code + `# %%` for lessons, Jupyter for exploration (Phase 2+), Colab for GPU (Phase 3+).
 
 ---
 
