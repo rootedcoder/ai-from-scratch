@@ -100,8 +100,8 @@ ai-from-scratch/
 
 - [x] **0.1** Python environment (venv, pip, folder structure)
 - [x] **0.2** VS Code setup (Python + Jupyter extensions, linting)
-- [ ] **0.3** Git basics — init, commit, log, branch (used every session from here)
-- [ ] **0.4** Jupyter notebooks — when to use vs plain `.py`
+- [x] **0.3** Git basics — init, commit, log, branch (used every session from here)
+- [x] **0.4** Jupyter notebooks — when to use vs plain `.py`
 - [ ] **0.5** GPU setup & cloud basics (Google Colab as fallback when compute needed)
 - [ ] **0.6** Docker for AI — containers for reproducibility (intro only, used in Phase 8)
 - [ ] **0.7** Data management basics — file formats (CSV, JSON, Parquet), folder conventions

@@ -119,3 +119,113 @@ If it doesn't, manually run `venv\Scripts\activate` before running any code.
 ### Git commit
 
 `Phase 0.2: VS Code setup complete, extensions installed, venv interpreter selected`
+
+---
+
+## Lesson 0.3 — Git Basics for This Curriculum
+
+**Date:** 2026-06-19
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### Why git matters in ML specifically
+
+In ML, git tracks three things simultaneously:
+
+- **Code** — model, training loop, experiments
+- **Notes** — your understanding of each concept
+- **Progress** — which topics are done, what numbers looked like
+
+Clean commit history = a readable diary of your entire learning journey.
+
+### Commands used every session
+
+```bash
+git status                    # see what's changed — run before every commit
+git log --oneline             # one line per commit — your progress diary
+git add filename.py           # stage specific files, never blind `git add .`
+git restore --staged file.py  # unstage something added by mistake
+git diff filename.py          # see exactly what changed before committing
+```
+
+### Commit format (used throughout this curriculum)
+
+```
+Phase X.Y: <what was built>
+```
+
+Examples:
+
+- `Phase 0.1: virtual environment setup, numpy 2.5.0, matplotlib 3.11.0, jupyter installed`
+- `Phase 2.2: linear regression from scratch, no libraries`
+- `Phase 3.5: autograd engine (micrograd-style)`
+
+### .gitignore rules for ML projects
+
+```
+venv/                  # never commit the virtual environment
+__pycache__/           # Python bytecode cache
+.DS_Store              # Mac metadata (good habit even on Windows)
+*.pyc                  # compiled Python files
+*.pth                  # PyTorch model weights — too large for git
+*.pkl                  # pickle files
+data/                  # raw datasets — too large
+.ipynb_checkpoints/    # Jupyter auto-save files
+```
+
+### Gotcha
+
+Files showing `U` in VS Code sidebar = unstaged changes. Always check `git status` before assuming your repo is clean. Commit these before ending any session.
+
+### Git commit
+
+`Phase 0.3: gitignore updated with ML-specific exclusions`
+
+---
+
+## Lesson 0.4 — Jupyter Notebooks
+
+**Date:** 2026-06-19
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### How Jupyter works
+
+Runs a local server on your machine, opens a browser at `http://localhost:8888`. Code runs on the local server — no internet needed.
+
+- `.ipynb` file — stores code cells, markdown cells, and outputs in one JSON file
+- Kernel — the Python process running behind the scenes executing your code
+
+### Start Jupyter
+
+```bash
+jupyter notebook   # starts server, opens browser automatically
+```
+
+### Key shortcuts
+
+| Shortcut        | Action                   |
+| --------------- | ------------------------ |
+| `Shift + Enter` | Run cell, move to next   |
+| `A`             | Insert cell above        |
+| `B`             | Insert cell below        |
+| `DD`            | Delete cell (D twice)    |
+| `M`             | Switch cell to Markdown  |
+| `Y`             | Switch cell back to Code |
+
+### Cell types
+
+- **Code cell** — runs Python, shows output below
+- **Markdown cell** — renders formatted text, used for documenting experiments alongside code
+- `[1]:` next to a cell = execution counter, shows the order cells were run
+
+### When to use what
+
+- **Jupyter** — exploring data, visualizing results, sharing work with others
+- **VS Code `# %%`** — writing lesson code, anything going into git (clean diffs)
+
+### Gotcha
+
+Jupyter notebooks store outputs inside the `.ipynb` JSON file — this makes git diffs messy. That's why `.ipynb_checkpoints/` is in `.gitignore`, and why we use VS Code `# %%` for code that gets committed.
+
+### Git commit
+
+`Phase 0.4: Jupyter setup verified, notebook basics covered`
