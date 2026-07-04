@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+.DS_Store
+*.pyc
+*.pth          # PyTorch model weights — too large for git
+*.pkl          # pickle files
+data/          # raw datasets — too large
+.ipynb_checkpoints/
