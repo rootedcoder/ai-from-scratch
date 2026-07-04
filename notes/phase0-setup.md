@@ -63,3 +63,59 @@ pip freeze > requirements.txt
 ### Git commit
 
 `Phase 0.1: virtual environment setup, numpy 2.5.0, matplotlib 3.11.0, jupyter installed`
+
+---
+
+## Lesson 0.2 — VS Code Setup
+
+**Date:** 2026-06-19
+**Repo cross-reference:** `phases/00-setup-and-tooling/`
+
+### Extensions installed
+
+- **Python** (Microsoft) — core Python support, IntelliSense, debugging
+- **Pylance** (Microsoft) — better autocomplete and type checking, installs alongside Python
+- **Python Debugger** (Microsoft) — step-through debugging
+- **Jupyter** (Microsoft) — runs `.ipynb` files and `# %%` cells inside VS Code
+- **GitLens** (GitKraken) — inline git history, blame, authorship per line
+
+### Pointing VS Code to venv
+
+`Ctrl + Shift + P` → `Python: Select Interpreter` → pick the one with `venv` in the path:
+
+```
+Python 3.14.3 ('venv': venv) .\venv\Scripts\python.exe
+```
+
+Confirmed in top-right corner of VS Code — shows `venv (Python 3.14.3)`.
+
+### How # %% cells work — key rule
+
+Each cell only knows about what's inside it OR what was run before it in the same session.
+Imports must be inside a cell, not floating above the first `# %%` marker.
+
+Wrong:
+
+```python
+import numpy as np   # outside any cell — ignored when running cells below
+# %%
+print(np.__version__)  # NameError: np not defined
+```
+
+Correct:
+
+```python
+# %%
+import numpy as np
+print(np.__version__)  # works fine
+```
+
+### Gotcha
+
+If VS Code opens a new PowerShell terminal, it auto-activates venv via:
+`venv\Scripts\Activate.ps1` — you'll see `(venv)` in the terminal automatically.
+If it doesn't, manually run `venv\Scripts\activate` before running any code.
+
+### Git commit
+
+`Phase 0.2: VS Code setup complete, extensions installed, venv interpreter selected`

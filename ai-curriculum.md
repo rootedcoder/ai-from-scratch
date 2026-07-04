@@ -99,7 +99,7 @@ ai-from-scratch/
 → repo: `phases/00-setup-and-tooling/`
 
 - [x] **0.1** Python environment (venv, pip, folder structure)
-- [ ] **0.2** VS Code setup (Python + Jupyter extensions, linting)
+- [x] **0.2** VS Code setup (Python + Jupyter extensions, linting)
 - [ ] **0.3** Git basics — init, commit, log, branch (used every session from here)
 - [ ] **0.4** Jupyter notebooks — when to use vs plain `.py`
 - [ ] **0.5** GPU setup & cloud basics (Google Colab as fallback when compute needed)
