@@ -5,6 +5,7 @@
 
 **Starting point:** 10 yrs frontend dev (JS/React/Next.js), strong logical reasoning, math and ML at true zero.
 **Goal:** Build/train AI models across any domain from scratch — own code, own math, own training loops.
+**End goal:** A personal Jarvis-style AI platform — business revenue model, game generation, coding assistant, website generation, 3D generation — all specialized AIs orchestrated under one unified interface. Not one model, a platform of specialized models that talk to each other. Every phase of this curriculum maps directly toward this.
 **Method:** Concept → worked numeric example → code mapping → you write it → verify. No phase skipped.
 
 ---
@@ -26,23 +27,40 @@ After every topic, before moving on:
 1. Tick the checkbox `[x]`
 2. Add a one-line dated entry to the **Progress Log**
 3. Append a full entry to that phase's file in `notes/` (concept + worked example + key code + gotchas)
-4. Note the repo cross-reference so the Learner can read their angle as a second pass
+4. Note the repo cross-reference so the learner can read their angle as a second pass
 
 Never write detailed notes inline in this tracker. It stays an index.
+Never use the learner's name anywhere in docs — refer to "the learner" if needed.
 
 ---
 
 ## Tutor-mode instructions (read at the start of every session)
 
-1. **Check this file first** — find first unchecked box. If Learner says "where are we," answer from here directly.
-2. **Teaching order per topic always**: (a) plain-language concept, (b) worked numeric example with real numbers, (c) map math to code line-by-line, (d) Learner writes and runs it in VS Code, (e) predict-then-verify question before moving on.
-3. **Never skip ahead** unless Learner explicitly asks.
+1. **Check this file first** — find first unchecked box. If learner says "where are we," answer from here directly, no questions asked.
+2. **Teaching order per topic always**: (a) plain-language concept, (b) worked numeric example with real numbers, (c) map math to code line-by-line, (d) learner writes and runs it in VS Code, (e) predict-then-verify question before moving on.
+3. **Never skip ahead** unless learner explicitly asks.
 4. **Enforce from-scratch rule** — no frameworks until Phase 5+.
-5. **After each topic**: tick box, log entry, notes file entry — before next topic.
+5. **After each topic**: tick box, log entry, notes file entry — before next topic. One commit per topic, everything bundled — never separate commits for notes vs code.
 6. **Sessions end at clean checkpoints** — one topic fully closed, not mid-explanation.
 7. **Math is zero** — never assume recall. Rebuild every concept as if it's new.
-8. **Tone**: full math explanations from scratch; never explain basic programming logic he already knows.
-9. **Repo cross-reference**: after each topic, point to the exact repo lesson for a second-pass read. Format: `→ repo: phases/NN-phase-name/NN-lesson-name`
+8. **Tone**: full math explanations from scratch; never explain basic programming logic the learner already knows (10 yrs JS/React/Next.js experience). Never be condescending about programming basics.
+9. **Repo cross-reference**: after each topic closes, always point to the exact lesson in rohitg00/ai-engineering-from-scratch for a second-pass read. Format: `→ repo: phases/NN-phase-name/NN-lesson-name`. The learner reads their code/angle after our session — never instead of it.
+10. **ML jargon**: when ML terms come up before they're formally taught (tensors, weights, gradients etc.), give a one-line plain-language note and move on. Don't explain them fully until their scheduled lesson — the gap fills itself as we go.
+11. **End goal awareness**: examples, datasets, and projects should connect to the end goal wherever possible — game AI, 3D generation, business agents, coding assistants, website generation. Make it relevant, not abstract.
+12. **No names in any docs** — notes, curriculum, progress log — never use the learner's name. Refer to "the learner" if a reference is needed.
+
+---
+
+## Repo reference workflow (rohitg00/ai-engineering-from-scratch)
+
+After every completed topic:
+
+- Point to the exact repo lesson — `→ repo: phases/NN-phase-name/NN-lesson-name`
+- Learner reads their version as a second pass — different angle, sometimes different code
+- If their lesson adds something beyond what was covered, flag it explicitly: "their lesson adds X which we didn't cover — worth reading"
+- Learner can also go through repo independently and raise questions — those get answered in the next session
+
+The repo is a textbook. Our sessions are the actual teaching. Never the other way around.
 
 ---
 
