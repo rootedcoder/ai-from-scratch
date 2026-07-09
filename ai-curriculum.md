@@ -143,11 +143,11 @@ _Every concept explained with real numbers before any code._
 
 ### 1.1 Algebra
 
-- [ ] **1.1.1** Variables, expressions, solving for x
-- [ ] **1.1.2** Functions: what `f(x)` means, domain, range
-- [ ] **1.1.3** Graphing lines: slope, intercept (`y = mx + b`)
-- [ ] **1.1.4** Exponents and logarithms — why `log` is everywhere in ML
-      → repo: `01-linear-algebra-intuition`
+- [x] **1.1.1** Variables, expressions, solving for x
+- [x] **1.1.2** Functions: what `f(x)` means, domain, range
+- [x] **1.1.3** Graphing lines: slope, intercept (`y = mx + b`)
+- [x] **1.1.4** Exponents and logarithms — why `log` is everywhere in ML
+      → repo: no direct match confirmed (see notes)
 
 ### 1.2 Calculus
 
@@ -543,6 +543,10 @@ _The field has moved past "transformer = AI" — these are the active directions
 - **2026-06-19**: Clarified "from scratch" philosophy. Phase 3 includes own autograd engine.
 - **2026-06-19**: Full merge with rohitg00/ai-engineering-from-scratch (503 lessons, 20 phases). Repo cross-references added per topic throughout. All missing topics incorporated: information theory, Fourier, graph theory, SVMs, KNN, anomaly detection, time series, Word2Vec, RNNs, GANs, VAEs, voice cloning, MCP deep dive (23 lessons), agent engineering (42 lessons), autonomous systems, multi-agent swarms, ethics/alignment, capstone projects.
 - **2026-07-04**: Phase 0 complete — all 8 setup lessons done. Environment solid: Python 3.14.3, venv, numpy 2.5.0, matplotlib 3.11.0, jupyter, VS Code configured, RTX 2060 GPU confirmed (CUDA 13.2), Docker and data management understood conceptually, debugging/profiling tools covered. Starting Phase 1 (Math Foundations) next session.
+- **2026-07-04**: 1.1.1 done — variables, expressions, solving linear equations for x. Learner solved 3/3 practice problems correctly, verified conceptually.
+- **2026-07-04**: 1.1.2 done — functions, f(x) notation, domain/range. Coded g(x)=1/x and h(x)=x²-4 in Python (`phase1-math/1_1_functions.py`), correctly predicted ZeroDivisionError for g(0) before running, correctly identified both roots of h(x). First encounter with reading a Python traceback.
+- **2026-07-04**: 1.1.3 done — slope/intercept, y=mx+b. Coded `line()` and `slope()` in `phase1-math/1_3_slope.py`, generated table for m=2,b=3, verified slope=2 using non-adjacent points (extra rigor beyond what was asked), tested negative slope (m=-5,b=5) and confirmed decreasing y. Correctly predicted m=0 gives a horizontal line at y=b.
+- **2026-07-04**: 1.1.4 done — exponents and logarithms. Coded `phase1-math/1_1_4_logs.py`, verified log2(16)=4, log10(100)=2, log(1)=0, and confirmed 2**10=1024 inverts to log2(1024)=10.0. Correctly predicted math.log(0) would raise an error; ran it and got ValueError: expected a positive input (Python 3.14's updated wording for the classic "math domain error"). Correctly reasoned that log(0) is undefined because a positive base raised to any real exponent is always >0, never reaching exactly 0. **Section 1.1 (Algebra) fully complete\*\* — moving to 1.2 (Calculus) next session. Also corrected: repo cross-references for all of 1.1 were wrong (see notes) — no confirmed matching lesson found yet for basic algebra topics in rohitg00/ai-engineering-from-scratch; will check catalog.html as needed rather than guess.
 
 ---
 
