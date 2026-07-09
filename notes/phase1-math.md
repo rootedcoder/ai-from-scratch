@@ -234,3 +234,42 @@ def numeric_derivative(f, x, h=0.0001):
 → repo: not yet checked — verify against catalog when reached.
 
 ---
+
+## 1.2.4 — Gradients: Vector of Partial Derivatives, Gradient Descent
+
+**Concept:** A gradient collects all partial derivatives of a function into one list: `∇f(x,y) = [∂f/∂x, ∂f/∂y]`. The gradient points in the direction of steepest _increase_. Moving opposite the gradient decreases the function fastest — that single idea, applied repeatedly in small steps, **is gradient descent** in its entirety.
+
+**Why it matters for ML:** a model's error is a function of its weights. The gradient tells you, for every weight simultaneously, which direction increases error; stepping the opposite way, repeatedly, is the entire training loop before any engineering (batching, optimizers, schedules — Phase 2-3) is layered on.
+
+**Worked example:** `f(x,y)=x²+y²` at (3,4): `∇f=[6,8]`. Moving opposite (toward `[-6,-8]` direction) moves x,y toward 0, which is the function's minimum — consistent with intuition.
+
+**Code:** `phase1-math/1_2_4_gradient.py`
+
+```python
+def gradient(x, y, n, h=0.0001):
+    df_dx = (f(x + h, y, n) - f(x, y, n)) / h
+    df_dy = (f(x, y + h, n) - f(x, y, n)) / h
+    return [df_dx, df_dy]
+
+def gradient_step(x, y, n, learning_rate=0.01, h=0.0001):
+    grad = gradient(x, y, n, h)
+    new_x = x - learning_rate * grad[0]
+    new_y = y - learning_rate * grad[1]
+    return new_x, new_y
+```
+
+**Practice results:**
+
+- `∇f(3,4) = [6.0001, 8.0001]` ✓ matches [2x,2y].
+- One `gradient_step`: (3,4)→(2.94, 3.92), confirmed by hand (3 - 0.01×6 = 2.94, etc.)
+- **50-step loop** (first Python `for`/`range` usage, translated directly from JS `for` loop syntax; also first use of modulo for "every 10th step" printing and Python's tuple-unpacking `x, y = gradient_step(...)`): x,y shrank monotonically from (3,4) toward 0; f(x,y) fell 25→24.0→16.0→10.7→7.1→4.8 over 50 steps. Correctly observed the step size decelerating near the minimum — explained by the gradient itself shrinking as x,y shrink (gradient=[2x,2y], smaller x,y → smaller gradient → smaller steps). Directly previews why training loss curves flatten near convergence rather than dropping linearly.
+
+**Gotcha:** none new numerically — the main new material was Python control flow (loops, modulo, tuple unpacking), not math.
+
+**End-goal link:** this is the complete conceptual mechanism of neural network training, seen end-to-end for the first time: compute gradient → step opposite it → repeat → watch loss fall. Phases 2-3 add engineering on top (real datasets, many more parameters, smarter step sizing) but introduce no new core idea beyond what was just run here on a 2-variable toy function.
+
+**Milestone:** closes the numeric-calculus arc (1.2.1→1.2.4) — derivative, rules, partial derivatives, and gradient descent now form one continuous, hands-on-verified thread. 1.2.5 (optimization) and 1.2.6 (convexity) formalize what was just observed empirically.
+
+→ repo: not yet checked — verify against catalog when reached.
+
+---
