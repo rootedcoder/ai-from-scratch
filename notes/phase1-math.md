@@ -141,3 +141,46 @@ print(math.log(1))
 **Section 1.1 (Algebra) — complete.** All four lessons (variables/solving, functions, slope/intercept, exponents/logs) closed 2026-07-04. Next: 1.2 Calculus.
 
 ---
+
+## 1.2.1 — What a Derivative Is: Rate of Change, Slope of a Curve, Numeric Intuition
+
+**Concept:** For a straight line, slope (1.1.3) is constant everywhere. A derivative extends the same idea to curves, where the rate of change is different at every point. Zoom in close enough on any point of a smooth curve and it looks like a straight line — the derivative is the slope of that local line. Core intuition: **derivative = slope, measured locally instead of globally.**
+
+**Why it matters for ML:** training adjusts weights to reduce error. Knowing which direction (and how much) to adjust a weight requires knowing the local slope of the error function at the current weight value — that's exactly what a derivative provides. Gradient descent (hand-built in Phase 2) is "compute local slope, step in the direction that decreases error, repeat."
+
+**Worked example:** `f(x) = x²` at `x=3`. Using two very close points (x=3, x=3.001):
+
+```
+f(3) = 9, f(3.001) = 9.006001
+m = (9.006001 - 9) / 0.001 = 6.001 ≈ 6
+```
+
+Shrinking the gap further converges toward exactly 6 — the true derivative at x=3.
+
+**Code:** `phase1-math/2_1_derivative.py`
+
+```python
+def f(x):
+    return x**2
+
+def numeric_derivative(f, x, h=0.0001):
+    return (f(x + h) - f(x)) / h
+```
+
+**Practice results:**
+
+- `x=3` → `6.000100000012054` ≈ 6
+- `x=0` → `9.999999999999999e-05` ≈ 0
+- `x=-2` → `-3.999900000000167` ≈ -4
+- Pattern discovered directly from the numbers: derivative of `x²` is `2x` everywhere (the power rule, to be derived algebraically in 1.2.2).
+- `h` shrinking experiment: `h=0.0001` gave error ≈ +0.0001; `h=1e-8` gave error ≈ -3.6e-8 — smaller `h` was more accurate, as expected.
+- Extended reasoning (not yet run, flagged as worth trying): shrinking `h` far enough (e.g. 1e-12 to 1e-15) eventually makes accuracy _worse_ rather than better, due to **catastrophic cancellation** — `f(x+h) - f(x)` becomes subtraction of two nearly-identical floats, and floating point only carries ~15-17 significant digits. Below that precision floor, the result is mostly rounding noise. Directly foreshadows curriculum topic 1.3.12 (numerical stability).
+- Correctly reasoned (after one initial miss, confusing "derivative" with "solve for x") that a straight line's derivative equals its constant slope: `f(x)=2x+3` → derivative is `2` everywhere; `f(x)=5` (flat line) → derivative is `0` everywhere. Both derived by connecting back to 1.1.3's `m` concept rather than new computation.
+
+**Gotcha:** `h` selection is a real tradeoff — too large gives a poor approximation of instantaneous slope (secant line, not tangent line); too small triggers floating-point cancellation error. There's a practical sweet spot, not a "smaller is always better" rule.
+
+**End-goal link:** this numeric-derivative approach is literally how you'd sanity-check a hand-derived analytical gradient later (a technique called "gradient checking," common when debugging backprop by hand in Phase 3) — comparing the numeric approximation against the algebraic formula to catch implementation bugs.
+
+→ repo: not yet checked — verify against `aiengineeringfromscratch.com/catalog.html` rather than assume a lesson name, per the correction made in section 1.1.
+
+---

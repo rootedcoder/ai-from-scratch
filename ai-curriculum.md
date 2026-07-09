@@ -151,7 +151,7 @@ _Every concept explained with real numbers before any code._
 
 ### 1.2 Calculus
 
-- [ ] **1.2.1** What a derivative is — rate of change, slope of a curve, numeric intuition
+- [x] **1.2.1** What a derivative is — rate of change, slope of a curve, numeric intuition
 - [ ] **1.2.2** Derivative rules: power rule, chain rule — worked examples by hand
 - [ ] **1.2.3** Partial derivatives — multi-variable functions
 - [ ] **1.2.4** Gradients — vector of partial derivatives, what "gradient descent" literally means
@@ -547,6 +547,7 @@ _The field has moved past "transformer = AI" — these are the active directions
 - **2026-07-04**: 1.1.2 done — functions, f(x) notation, domain/range. Coded g(x)=1/x and h(x)=x²-4 in Python (`phase1-math/1_1_functions.py`), correctly predicted ZeroDivisionError for g(0) before running, correctly identified both roots of h(x). First encounter with reading a Python traceback.
 - **2026-07-04**: 1.1.3 done — slope/intercept, y=mx+b. Coded `line()` and `slope()` in `phase1-math/1_3_slope.py`, generated table for m=2,b=3, verified slope=2 using non-adjacent points (extra rigor beyond what was asked), tested negative slope (m=-5,b=5) and confirmed decreasing y. Correctly predicted m=0 gives a horizontal line at y=b.
 - **2026-07-04**: 1.1.4 done — exponents and logarithms. Coded `phase1-math/1_1_4_logs.py`, verified log2(16)=4, log10(100)=2, log(1)=0, and confirmed 2**10=1024 inverts to log2(1024)=10.0. Correctly predicted math.log(0) would raise an error; ran it and got ValueError: expected a positive input (Python 3.14's updated wording for the classic "math domain error"). Correctly reasoned that log(0) is undefined because a positive base raised to any real exponent is always >0, never reaching exactly 0. **Section 1.1 (Algebra) fully complete\*\* — moving to 1.2 (Calculus) next session. Also corrected: repo cross-references for all of 1.1 were wrong (see notes) — no confirmed matching lesson found yet for basic algebra topics in rohitg00/ai-engineering-from-scratch; will check catalog.html as needed rather than guess.
+- **2026-07-04**: 1.2.1 done — derivatives as local slope, numeric intuition. Coded `numeric_derivative()` in `phase1-math/2_1_derivative.py`, computed derivative of x² at x=3,0,-2, discovered the 2x pattern from the numbers directly. Explored h shrinking (0.0001 → more accurate at 1e-8) and was introduced to catastrophic cancellation as the reason accuracy degrades if h shrinks too far (ties to 1.3.12 numerical stability, upcoming). Correctly reasoned that a line's derivative equals its constant slope (2 for f(x)=2x+3, 0 for f(x)=5) by connecting back to 1.1.3's slope concept, after an initial miss (confused "derivative" with "solve for x").
 
 ---
 
