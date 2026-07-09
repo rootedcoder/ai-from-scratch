@@ -184,3 +184,29 @@ def numeric_derivative(f, x, h=0.0001):
 → repo: not yet checked — verify against `aiengineeringfromscratch.com/catalog.html` rather than assume a lesson name, per the correction made in section 1.1.
 
 ---
+
+## 1.2.2 — Derivative Rules: Power Rule, Chain Rule
+
+**Concept:** The power rule gives the exact derivative of any power of x without numeric approximation: `f(x)=xⁿ → f'(x)=n·x^(n-1)` (bring the exponent down as a multiplier, reduce exponent by 1). Confirms 1.2.1's discovered pattern: n=2 gives f'(x)=2x. The chain rule handles nested functions: `f(x)=g(h(x)) → f'(x)=g'(h(x))·h'(x)` — derivative of the outer function (evaluated at the inner function's output), times the derivative of the inner function.
+
+**Why it matters for ML:** a neural network is a chain of nested functions (each layer feeds the next). Computing how an early-layer weight affects final error requires the chain rule applied repeatedly, layer by layer — this exact algorithm is backpropagation (Phase 3.5). The chain rule is the mathematical engine underneath it.
+
+**Worked example (power rule):** `f(x)=x³ → f'(x)=3x²`. At x=2: f'(2)=12, confirmed numerically.
+
+**Worked example (chain rule):** `f(x)=(2x+3)²`, outer `g(u)=u²`, inner `h(x)=2x+3`. `g'(u)=2u`, `h'(x)=2`. `f'(x)=2(2x+3)·2=8x+12`. At x=1: f'(1)=20, confirmed numerically.
+
+**Code:** `phase1-math/1_2_2_rules.py` — generalized beyond what was asked: built `f_exponent(x, n)` and `f_exponent_derivative(x, n)` for any power n (not hardcoded to cubic), reusing `power_rule(n)` helper. Chain rule implemented by explicitly separating and multiplying the outer-derivative and inner-derivative components rather than just hardcoding the final formula.
+
+**Practice results (all correct):**
+
+- Power rule, x³ at x=3: exact=27, numeric≈27.0009 ✓
+- Chain rule, (2x+3)² at x=3: exact=36, numeric≈36.0004 ✓
+- Predicted derivative of x¹ (mechanically applying the rule: multiplier=1, new_exponent=0) = 1. Correctly connected this to 1.1.3 — f(x)=x is y=mx+b with m=1, so derivative=1 is just confirming the already-known slope.
+
+**Gotcha:** none new — this topic was mostly a formalization/confirmation of 1.2.1's numeric findings rather than introducing new failure modes.
+
+**End-goal link:** power rule + chain rule are the two rules that, applied together and repeatedly, constitute backpropagation. Every gradient computed in Phase 3 onward is built from exactly these two mechanisms, just applied at much larger scale (many nested layers, many variables) — nothing conceptually new happens between here and hand-deriving backprop, only more bookkeeping.
+
+→ repo: not yet checked — verify against catalog when reached.
+
+---
