@@ -210,3 +210,27 @@ def numeric_derivative(f, x, h=0.0001):
 → repo: not yet checked — verify against catalog when reached.
 
 ---
+
+## 1.2.3 — Partial Derivatives: Multi-Variable Functions
+
+**Concept:** For functions of multiple variables (`f(x,y)`), a partial derivative asks "how does f change if I nudge one variable, freezing all others?" Notation: `∂f/∂x`. Mechanics: treat every other variable as a plain constant, then apply the same single-variable rules already known (power rule etc.) to the variable being differentiated.
+
+**Why it matters for ML:** a model with a million weights is a function of a million variables. Training requires knowing how error changes with respect to each individual weight, one at a time, holding the rest fixed — that's a partial derivative, computed once per weight. 1.2.4 (gradients) is just "collect all partials into one list."
+
+**Worked example:** `f(x,y)=x²+y²`. `∂f/∂x`: treat y² as a constant (derivative 0), x² gives 2x via power rule → `∂f/∂x=2x`. Symmetric: `∂f/∂y=2y`. Verified numerically at (3,4): nudging only x gives ≈6, matching 2(3)=6.
+
+**Code:** `phase1-math/1_2_3_partials.py` — generalized `f(x,y,n)=xⁿ+yⁿ` with parameterized exponent, reused across the discovery exercise and the three-variable extension.
+
+**Practice results (all correct):**
+
+- `f(x,y)=x²+y²` at (3,4): ∂f/∂x≈6.0001 (matches 2x=6), ∂f/∂y≈8.0001 (matches 2y=8).
+- `f(x,y)=x·y` at (3,4): ∂f/∂x≈4.0000 (matches y=4), ∂f/∂y≈3.0000 (matches x=3). Pattern: the two variables swap places in each other's partial — when y is held constant, x·y is "constant times x," whose derivative is just the constant. This is the seed of the **product rule** (not formally in the curriculum's named-rules list, but self-discovered here through direct experimentation).
+- `f(x,y,z)=x²+y²+z²` at (3,4,5): all three partials correct (6.0001, 8.0001, 10.0001) — correctly reasoned each partial depends only on its own variable, since squared terms in different variables don't interact under single-variable differentiation.
+
+**Gotcha:** none new — extends 1.2.1/1.2.2 mechanically rather than introducing new numerical pitfalls.
+
+**End-goal link:** this is the exact atomic operation used millions of times over during real model training — one partial derivative per weight, per training step. 1.2.4 (gradients) packages these into a single vector; that vector is what "gradient descent" descends along.
+
+→ repo: not yet checked — verify against catalog when reached.
+
+---

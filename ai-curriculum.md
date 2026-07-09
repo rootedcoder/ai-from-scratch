@@ -153,7 +153,7 @@ _Every concept explained with real numbers before any code._
 
 - [x] **1.2.1** What a derivative is — rate of change, slope of a curve, numeric intuition
 - [x] **1.2.2** Derivative rules: power rule, chain rule — worked examples by hand
-- [ ] **1.2.3** Partial derivatives — multi-variable functions
+- [x] **1.2.3** Partial derivatives — multi-variable functions
 - [ ] **1.2.4** Gradients — vector of partial derivatives, what "gradient descent" literally means
 - [ ] **1.2.5** Optimization — minimizing a function, why we move against the gradient
 - [ ] **1.2.6** Convex vs non-convex functions — why it matters for training
@@ -549,6 +549,7 @@ _The field has moved past "transformer = AI" — these are the active directions
 - **2026-07-04**: 1.1.4 done — exponents and logarithms. Coded `phase1-math/1_1_4_logs.py`, verified log2(16)=4, log10(100)=2, log(1)=0, and confirmed 2**10=1024 inverts to log2(1024)=10.0. Correctly predicted math.log(0) would raise an error; ran it and got ValueError: expected a positive input (Python 3.14's updated wording for the classic "math domain error"). Correctly reasoned that log(0) is undefined because a positive base raised to any real exponent is always >0, never reaching exactly 0. **Section 1.1 (Algebra) fully complete\*\* — moving to 1.2 (Calculus) next session. Also corrected: repo cross-references for all of 1.1 were wrong (see notes) — no confirmed matching lesson found yet for basic algebra topics in rohitg00/ai-engineering-from-scratch; will check catalog.html as needed rather than guess.
 - **2026-07-04**: 1.2.1 done — derivatives as local slope, numeric intuition. Coded `numeric_derivative()` in `phase1-math/2_1_derivative.py`, computed derivative of x² at x=3,0,-2, discovered the 2x pattern from the numbers directly. Explored h shrinking (0.0001 → more accurate at 1e-8) and was introduced to catastrophic cancellation as the reason accuracy degrades if h shrinks too far (ties to 1.3.12 numerical stability, upcoming). Correctly reasoned that a line's derivative equals its constant slope (2 for f(x)=2x+3, 0 for f(x)=5) by connecting back to 1.1.3's slope concept, after an initial miss (confused "derivative" with "solve for x").
 - **2026-07-04**: 1.2.2 done — power rule and chain rule, worked by hand and verified numerically. Coded `phase1-math/1_2_2_rules.py`; generalized power rule to any n (not just the x³ example given), verified against numeric_derivative for x³ at x=3 (27 vs 27.0009) and chain rule on (2x+3)² at x=3 (36 vs 36.0004). Correctly predicted derivative of x¹ is 1 by applying the rule mechanically, connected to 1.1.3 (slope of f(x)=x is 1).
+- **2026-07-04**: 1.2.3 done — partial derivatives, multi-variable functions. Coded `phase1-math/1_2_3_partials.py`, generalized f(x,y,n)=xⁿ+yⁿ with parameterized n, verified ∂f/∂x=2x, ∂f/∂y=2y at (3,4) numerically (6.0001, 8.0001). Tested f(x,y)=x·y, correctly discovered ∂f/∂x=y, ∂f/∂y=x (the two variables swap — seed of the product rule, not formally named in curriculum but self-discovered). Extended to three variables x²+y²+z² at (3,4,5), all three partials correct (6.0001, 8.0001, 10.0001), correctly reasoning each partial only depends on its own variable.
 
 ---
 
