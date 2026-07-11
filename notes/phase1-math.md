@@ -378,3 +378,112 @@ Framed against JS: roughly `v1.map((val,i)=>val*v2[i]).reduce((a,b)=>a+b)`, but 
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers dot products directly per prior review.
 
 ---
+
+## 1.3.3 — Matrices: What They Represent, Shapes, Notation
+
+**Concept:** A matrix is a 2D grid of numbers — rows and columns — describable as a list of vectors stacked together. Shape is `rows × columns`; a `2×3` matrix ≠ a `3×2` matrix even with rearranged values. Entries addressed by `(row, col)`.
+
+**Why it matters for ML:** a single neuron's weights are a vector (1.3.1/1.3.2). A whole layer of neurons (multiple neurons, same inputs) stacks their weight vectors into a matrix — one row per neuron. Every layer in a real network is fundamentally a weight matrix; matrix operations (starting 1.3.4) let a whole layer's computation happen in one operation instead of looping neuron-by-neuron.
+
+**Worked example:** a tiny 2-neuron layer, each looking at 3 inputs:
+```
+W = [ 0.1  0.2  0.3 ]   ← neuron 1's weights
+    [ 0.4  0.5  0.6 ]   ← neuron 2's weights
+```
+Shape: `2×3` (2 neurons/rows, 3 weights/columns each).
+
+**Code:** `phase1-math/1_3_3_matrices.py` — matrix represented as a list of lists (pre-NumPy).
+```python
+def matrix_shape(M):
+    rows = len(M)
+    columns = len(M[0])
+    return rows, columns
+
+def get_row(M, i):
+    return M[i]
+
+def get_column(M, j):
+    return [M[i][j] for i in range(len(M))]
+```
+
+**Practice results (all correct):**
+- `matrix_shape(W) = (2, 3)` ✓
+- `get_row(W, 0) = [0.1, 0.2, 0.3]` ✓
+- `get_column(W, 1) = [0.2, 0.5]` ✓ (Python 0-indexed second column). Function logic verified correct in general (comprehension walks every row at fixed column index j).
+- Correctly predicted: transposing a `2×3` matrix produces a `3×2` matrix (rows/columns swap counts).
+
+**Gotcha (tutor-side, noted for accuracy):** the lesson's worked example used 1-indexed math column language ("Column 1", "Column 2"...) while the exercise instructions referenced a 0-indexed Python column target — an internal inconsistency introduced by the tutor, not a learner error. Resolved by confirming the `get_column` function's correctness directly rather than requiring a specific index re-run. Worth remembering going forward: default to Python's 0-indexing consistently in exercise instructions from here on.
+
+**End-goal link:** matrices are the actual data structure holding every layer's weights in every model in the Jarvis platform. 1.3.4 (matrix-vector multiplication) is where this stops being just storage and becomes the mechanism for computing a whole layer's output in one operation.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrices per prior review.
+
+---
+
+## 1.3.4 — Matrix-Vector Multiplication: By Hand on a 2×2 Example
+
+**Concept:** Multiplying a matrix `M` by a vector `v` produces a new vector, where each entry is the dot product (1.3.2) of one row of `M` with `v`. Mechanically: one dot product per row, collected into a new vector. Requires `M`'s column count to match `v`'s length (formal reasoning why deferred to 1.3.5).
+
+**Why it matters for ML:** for a weight matrix `W` (2 neurons × 3 inputs, from 1.3.3) and input vector `x` (3 values), `W·x` computes *both* neurons' outputs simultaneously — row 1 dotted with x gives neuron 1's output, row 2 gives neuron 2's output. No loop over neurons needed. This is the exact operation inside every forward pass of every layer in every network built from Phase 3 onward.
+
+**Worked example:** `M=[[2,1],[0,4]]`, `v=[3,5]`. Row 1: `[2,1]·[3,5]=6+5=11`. Row 2: `[0,4]·[3,5]=0+20=20`. Result: `[11,20]`.
+
+**Code:** `phase1-math/1_3_4_matrix_vector.py` (dot_product/get_row reimplemented inline rather than imported — first mention of Python `import`/`from...import` syntax, deferred as unnecessary until codebase grows):
+```python
+def matrix_vector_multiply(M, v):
+    return [vector_dot_product(get_row(M, i), v) for i in range(len(M))]
+```
+
+**Practice results (all correct):**
+- `M·v = [11, 20]` — matches worked example.
+- `W·x` for `W=[[0.1,0.2,0.3],[0.4,0.5,0.6]]`, `x=[1,2,3]` → `[1.4, 3.1999999999999997]`. Hand-computed first: row1=0.1+0.4+0.9=1.4, row2=0.4+1.0+1.8=3.2 — trailing digits are the same floating-point representation quirk seen in earlier lessons (3.2 isn't exactly representable in binary float), not a bug.
+- **Shape-mismatch prediction — notably strong, independent reasoning:** correctly distinguished two different failure modes based on which vector's length drives `vector_dot_product`'s internal loop (`range(len(v1))`, where `v1` is always the matrix row):
+  - `M` is `2×2` (rows length 2), `v` has length 3 → loop only reaches indices 0,1 of `v`; `v[2]` is silently never accessed. No error, silently incomplete/wrong result.
+  - `M` is `4×4` (rows length 4), `v` has length 3 → loop tries to reach index 3 of `v`, which doesn't exist → `IndexError`.
+  Both predicted correctly before running, with accurate reasoning about the *mechanism* (not just the outcome) — a genuinely subtle point about how the same category of shape mismatch can fail silently or loudly depending on implementation direction.
+
+**Gotcha:** silent failure (Case 1 above) is more dangerous than a loud error (Case 2) precisely because nothing signals anything went wrong — a real category of bug to watch for once real matrix/vector shapes get large and errors aren't visually obvious.
+
+**End-goal link:** this is literally the forward-pass computation for one layer of a neural network, computed by hand for the first time. 1.3.5 (matrix-matrix multiplication) extends this from "one input vector" to "a whole batch of inputs at once" — the actual training-time operation.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrix-vector operations per prior review.
+
+---
+
+## 1.3.5 — Matrix-Matrix Multiplication: By Hand, Why the Shapes Must Match
+
+**Concept:** Matrix-matrix multiplication is matrix-vector multiplication extended to a whole batch of vectors at once — stack input vectors as columns of a second matrix. `result[i][j] = row i of A · column j of B`. Shape rule follows directly from dot product's equal-length requirement (1.3.2): row i of A has length = A's column count; column j of B has length = B's row count; these must match for the dot product to be defined. Stated precisely: `(m×n)·(n×p) = (m×p)` — inner dimensions must match, outer dimensions become the result shape.
+
+**Why it matters for ML:** `W` (neurons × inputs) times `X` (inputs × batch_size) gives every neuron's output for every batch example in one operation — the actual computation GPUs are optimized for, and the reason "shape mismatch" errors are extremely common once real models are built (Phase 3+).
+
+**Worked example:** `A=[[1,2],[3,4]]`, `B=[[5,6],[7,8]]`, both 2×2. `A·B=[[19,22],[43,50]]` (each entry a row·column dot product).
+
+**Code:** `phase1-math/1_3_5_matrix_matrix.py`
+```python
+def matrix_multiply(A, B):
+    rows_A = len(A)
+    cols_B = len(B[0])
+    if len(A[0]) != len(B):
+        return "Error: Number of columns in A must equal number of rows in B..."
+    result = []
+    for i in range(rows_A):
+        row_result = []
+        for j in range(cols_B):
+            row_result.append(dot_product(get_row(A, i), get_column(B, j)))
+        result.append(row_result)
+    return result
+```
+Notably added the shape-validation guard **without being asked** — independently arrived at the same defensive-programming pattern real ML frameworks use (raising a clear shape-mismatch error rather than letting execution fail deep inside with a confusing low-level exception).
+
+**Practice results (all correct):**
+- `A·B = [[19,22],[43,50]]` ✓
+- `W(2×3)·X(3×2) = [[1.4,3.2],[3.2,7.7]]` — first full mini-batch forward pass by hand and code; correctly interpreted result shape (2×2) as "2 neurons × 2 batch examples," e.g. result[1][1]=7.7 is neuron 2's output for batch example 2.
+- Mismatch test: with validation, correctly caught `2×3`×`2×3` (inner dims 3≠2) and returned a custom error message. With validation removed, correctly predicted and confirmed `IndexError: list index out of range` — traced the exact mechanism: dot_product loops `range(len(row))` where row length is 3 (from W's columns), but each column of the mismatched second matrix only has length 2, so index 2 doesn't exist.
+
+**Gotcha:** none new mechanically — this topic's real lesson was as much about defensive input validation as about the matrix math itself.
+
+**End-goal link:** this is the literal batch forward-pass computation used in every real training step from Phase 2 onward — one matrix multiplication computing every neuron's output for every example in a batch simultaneously. The self-added validation pattern previews Phase 3.13 (debugging neural networks) and general production practices (Phase 11) where clear error messages at shape-mismatch boundaries save significant debugging time.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrix multiplication per prior review.
+
+---
