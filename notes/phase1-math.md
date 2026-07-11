@@ -317,3 +317,64 @@ def gradient_descent_1d(x_start, steps=100, learning_rate=0.01):
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — confirmed relevant for 1.3, not for 1.2. No confirmed match found for calculus-specific lessons in this phase; check catalog if a dedicated one is wanted.
 
 ---
+
+## 1.3.1 — Vectors: What They Are, Addition, Scaling, Geometric Intuition
+
+**Concept:** A vector is an ordered list of numbers representing magnitude and direction — geometrically, an arrow from the origin to a coordinate. Already encountered implicitly in 1.2.4 (the gradient `[6,8]` was a vector). Two core operations: **addition** (add corresponding elements; geometrically, place the second arrow's tail at the first arrow's tip) and **scalar multiplication** (multiply every element by one number; geometrically, stretches/shrinks/flips the arrow's length without changing its line of direction unless the scalar is negative).
+
+**Why it matters for ML:** weights, inputs, and gradients in a neural network are vectors — lists of many numbers treated as one object. Vector addition/scaling/dot-product (next lesson) are the actual operations run across a whole layer at once. This is also why NumPy exists and is permitted under the from-scratch rule: it's fast vector arithmetic, and vectors are the real unit neural networks compute with.
+
+**Worked example:** `v1=[3,4]`, `v2=[1,2]`. Addition: `[4,6]`. Scaling `3×v1=[9,12]` (same direction, 3x length). Negative scaling `-1×v1=[-3,-4]` (opposite direction, same length).
+
+**Code:** `phase1-math/1_3_1_vectors.py` — first use of Python list comprehensions:
+```python
+def vector_add(v1, v2):
+    return [v1[i] + v2[i] for i in range(len(v1))]
+
+def vector_scale(v, scalar):
+    return [scalar * x for x in v]
+```
+Framed against JS: `[... for i in range(len(v1))]` is roughly `v1.map((val,i) => val + v2[i])` — same idea (transform each element), Python syntax built into the language core rather than a method call. Also noted: raw Python `+` on lists concatenates rather than adds element-wise (`[3,4]+[1,2] → [3,4,1,2]`), which is why explicit functions are needed before NumPy is introduced later.
+
+**Practice results (all correct, used own vectors [3,2] and [1,4] rather than the worked example's):**
+- `[3,2]+[1,4] = [4,6]`
+- `3×[3,2] = [9,6]`
+- `-1×[3,2] = [-3,-2]` — correctly reasoned as a direction flip.
+- `0×[3,2] = [0,0]` — the **zero vector**: zero magnitude means no direction at all.
+- First linear combination, by hand and in code: `2×[1,1] + 3×[2,0] = [2,2]+[6,0] = [8,2]`, matching printed output exactly.
+
+**Gotcha:** raw Python list `+` is concatenation, not element-wise addition — an easy trap coming from JS/math intuition, addressed proactively before it caused confusion.
+
+**End-goal link:** a linear combination (scale several vectors independently, then sum) is *exactly* what a single neuron computes: `weight1×input1 + weight2×input2 + ...`. The `2×[1,1]+3×[2,0]` exercise is, structurally, identical to a tiny 2-input neuron's weighted sum — first direct, concrete bridge from linear algebra mechanics to an actual neural network operation.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — now genuinely relevant; content previously reviewed covers vectors directly. Worth reading as second pass.
+
+---
+
+## 1.3.2 — Dot Product: Arithmetic and Geometric Meaning
+
+**Concept:** The dot product multiplies corresponding elements of two equal-length vectors and sums the results into a single scalar: `[a1,a2]·[b1,b2] = a1×b1 + a2×b2`. Unlike vector addition/scaling (1.3.1), the output is a number, not a vector.
+
+**Why it matters for ML:** this is the exact operation a single neuron performs — `[input1,input2,...]·[weight1,weight2,...]` — before an activation function (Phase 3.3) is applied on top. Also has a geometric meaning via `a·b = |a||b|cos(θ)`: same direction → large positive, perpendicular → exactly zero, opposite direction → large negative. This is the mathematical basis for measuring similarity between vectors — word/document embeddings (5B.3, 8.2) use dot products (or cosine similarity, a normalized version) to quantify "how similar are these two things."
+
+**Worked example:** `[3,4]·[1,2] = 3+8 = 11`. Opposite-direction check: `[3,4]·[-3,-4] = -9-16 = -25` (strongly negative). Perpendicular check: `[3,4]·[4,-3] = 12-12 = 0` (exactly zero — rotating a vector 90° via the swap-and-negate trick).
+
+**Code:** `phase1-math/1_3_2_dot_product.py` — first use of a generator expression:
+```python
+def dot_product(v1, v2):
+    return sum(v1[i] * v2[i] for i in range(len(v1)))
+```
+Framed against JS: roughly `v1.map((val,i)=>val*v2[i]).reduce((a,b)=>a+b)`, but Python feeds values directly into `sum()` without materializing an intermediate list — more memory-efficient for large vectors, relevant later at real model scale.
+
+**Practice results (all correct):**
+- `[3,4]·[1,2]=11`, `[3,4]·[-3,-4]=-25`, `[3,4]·[4,-3]=0` — all confirmed the angle-based intuition.
+- Own 3D example, `[10,15,20]·[12.5,17.5,22.5]=837.5` — vectors weren't perfectly proportional but shared the same-sign components throughout, still confirming "roughly similar direction → strongly positive."
+- Conceptual question (dot product vs. linear combination): correctly identified scalar-vs-vector output as the key distinction. Refined further: a dot product has the same multiply-then-sum shape as a linear combination, but the scaling weights come from the other vector's own components rather than being externally chosen constants — a close structural cousin, not an unrelated operation.
+
+**Gotcha:** none new — mechanically straightforward given 1.3.1's foundation; the generator-expression syntax is the only new Python surface area.
+
+**End-goal link:** every neuron's forward pass, at its core, is one dot product plus a bias plus an activation function. This is also the literal mechanism behind semantic search and retrieval (Phase 8.2/8.4, RAG) — comparing a query embedding against document embeddings via dot product/cosine similarity to find the most relevant matches.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers dot products directly per prior review.
+
+---
