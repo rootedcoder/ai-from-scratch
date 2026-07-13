@@ -487,3 +487,43 @@ Notably added the shape-validation guard **without being asked** — independent
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrix multiplication per prior review.
 
 ---
+
+## 1.3.6 — Matrix Transformations & Eigenvalues: What a Matrix "Does" to Space
+
+**Concept:** A matrix can be understood geometrically as a transformation of space — `M·v` moves `v` according to the matrix's rule (stretch, rotate, reflect, etc.). An **eigenvector** is a special vector whose direction a matrix doesn't change, only its length (or it flips exactly opposite): `M·v = λ·v`. The scalar `λ` is the **eigenvalue** — how much that direction gets stretched/shrunk. Most vectors get genuinely redirected by a matrix; eigenvectors are the rare exceptions that only get scaled.
+
+**Clarified during session (worth keeping as reference):** the identity matrix is a degenerate example — every vector is an eigenvector of `I` with `λ=1`, since `I` changes nothing. Not the general case, just the simplest possible one.
+
+**Why it matters for ML:** eigenvectors/eigenvalues underlie PCA (1.3.10, finding the most important directions of variation in data) and explain why repeated matrix multiplication in deep networks can cause values to explode (large eigenvalues) or vanish (small eigenvalues) — directly connects to 1.3.12 (numerical stability) and the real Phase 3 problem of vanishing/exploding gradients.
+
+**Worked example:** `M=[[2,0],[0,1]]`. `[1,0]` → `[2,0]` = `2×[1,0]`, eigenvector, λ=2. `[0,1]` → `[0,1]` = `1×[0,1]`, eigenvector, λ=1. `[1,1]` → `[2,1]`, direction genuinely changed, not an eigenvector.
+
+**Code:** `phase1-math/1_3_6_eigen.py`
+```python
+def check_eigenvector(M, v):
+    result = matrix_vector_multiply(M, v)
+    ratios = [result[i] / v[i] for i in range(len(v)) if v[i] != 0]
+    if all(abs(r - ratios[0]) < 1e-9 for r in ratios):
+        return True, ratios[0]
+    return False, None
+```
+
+**Extended line-by-line discussion (significant portion of this session), each resolved before continuing:**
+- List comprehension `if v[i] != 0` clarified as a *filter* — skips (never computes) the expression for indices where the condition is false, preventing division by zero, distinguished from a general transform.
+- `all(abs(r - ratios[0]) < 1e-9 for r in ratios)` broken into three layers: (1) `abs(diff) < tolerance` as "are these two numbers essentially equal, accounting for floating-point noise," (2) the generator expression producing one True/False per ratio (same pattern as 1.3.2's `dot_product`), (3) `all()` as Python's equivalent of JS `.every()` — every check must pass.
+- Addressed why `diff > 0` doesn't work (only tests direction/magnitude of inequality, not closeness, and misses cases where `r` is slightly *smaller* than `ratios[0]`) and why rounding to whole numbers is too coarse (would incorrectly equate distinct eigenvalues like 1.5 vs 2.3, throwing away far more precision than floating-point noise actually requires). Connected to `np.isclose()` as the real-world standard version of this exact pattern, to be met again in gradient-checking (Phase 3).
+
+**Practice results (all correct, all predicted before running):**
+- `M=[[2,0],[0,1]]`, `v=[1,0]` → `(True, 2.0)` ✓
+- `M=[[2,0],[0,1]]`, `v=[1,1]` → `(False, None)` ✓ — components scaled by different amounts (2x vs 1x), direction changes.
+- `N=[[0,1],[1,0]]` (reflection across y=x), `v=[1,1]` → `(True, 1.0)` ✓ — lies exactly on the mirror line, reflection leaves it unchanged.
+- `N=[[0,1],[1,0]]`, `v=[1,-1]` → `(True, -1.0)` ✓ — perpendicular to the mirror line, reflection flips it to point exactly opposite, same length.
+- Self-observed pattern: a reflection matrix has exactly two eigenvector directions (the mirror line itself, and its perpendicular) — every other vector gets partially rotated rather than purely scaled.
+
+**Gotcha:** none new mathematically — the real depth this session came from thoroughly understanding the verification code itself (filtering, tolerance comparison, generator expressions) rather than treating it as a black box, which is worth preserving as a good pattern to keep encouraging.
+
+**End-goal link:** eigenvalues explain why weight initialization matters (Phase 3.9) and why very deep networks can suffer from vanishing/exploding values during training — both are, at their core, about what happens when you repeatedly apply matrices whose eigenvalues are consistently above or below 1.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrix transformations per prior review.
+
+---
