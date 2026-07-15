@@ -742,3 +742,45 @@ def pca(data, n_components):
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — check for linear-systems-specific coverage; not yet confirmed present in the reviewed content.
 
 ---
+
+## 1.3.12 — Numerical Stability: Why Floating Point Errors Matter in Deep Learning
+
+**Concept:** No new math — this lesson names and consolidates a theme that has recurred throughout the entire section: floating point isn't perfectly precise, and algorithm structure determines whether that imprecision stays harmless or compounds into real errors. Recap of prior sightings: 1.2.1 (h-shrinking, catastrophic cancellation first named), 1.2.5 (floating noise breaking an unstable equilibrium), 1.3.4/1.3.5/1.3.8 (float tails like 3.1999999999999997), 1.3.9/1.3.10/1.3.11 (NumPy's internal algorithms flagged as deliberately different from naive by-hand formulas).
+
+**Why it matters for ML:** deep networks chain thousands of operations; small per-operation errors can compound into **exploding gradients** (errors amplify) or **vanishing gradients** (errors shrink to nothing, learning stalls) — both connect directly to 1.3.6's eigenvalues (repeated multiplication by matrices with eigenvalues consistently >1 or <1).
+
+**Two concrete failure modes demonstrated:**
+
+**1. Underflow with exponential decay.** `phase1-math/1_3_12_numerical_stability.py`: multiplying 200 copies of `0.01` directly collapsed to exactly `0.0` around iteration 162 (float64's absolute representable floor, ≈5×10⁻³²⁴). The log-space equivalent (`sum of log(0.01)` instead of `product of 0.01`) stayed a precise, meaningful number the entire time (-833.5 at iteration 180) — concrete, live demonstration of why 1.1.4 called `log` a numerical-stability necessity rather than stylistic.
+
+**2. Catastrophic cancellation, sharpest form yet.** Predicted `(1.0 + 1e-16) - 1.0` would print something close to `1e-16` (reasonable in principle) — **actual result: exactly `0.0`**, a genuine miss worth understanding precisely. Introduced **machine epsilon** (~2.22×10⁻¹⁶ near magnitude 1.0 — the smallest gap float64 can represent between two distinct numbers at that scale): `1e-16` is smaller than that gap, so `1.0 + 1e-16` rounds back down to exactly `1.0` *before* any subtraction even happens — the information is destroyed at the addition step, not the subtraction. `relative_error` correctly returned `0.0` too — not a bug, an accurate report that 100% of the intended signal was lost, not partially degraded.
+
+**Code:**
+```python
+def underflow_computation():
+    p = 0.01
+    product = 1.0
+    log_p = math.log(p)
+    log_sum = 0.0
+    for i in range(200):
+        product *= p
+        log_sum += log_p
+```
+
+**Conceptual question on why NumPy's real algorithms (LU/QR decomposition — named, not built here) beat naive inverse-via-determinant:** required a full rebuild from scratch after an initial "not sure I understand" response. Resolved by directly connecting to the just-observed cancellation result: computing an explicit inverse (determinant + cofactors, as hand-done in 1.3.11) involves many multiplication/subtraction/division steps, each a potential site for the exact kind of catastrophic information loss just witnessed in the `1e-16` example — worse as matrices grow larger or determinants shrink toward zero. NumPy's internal algorithms are structured specifically to avoid ever subtracting two dangerously close numbers, which is the real (not merely speed-related) reason they're preferred in practice.
+
+**Gotcha:** the `1e-16` prediction miss is itself the most valuable result of this lesson — a clean, first-hand demonstration that "small errors accumulate gradually" isn't the only failure mode; some operations lose information *instantly and completely* the moment a value crosses below the local precision floor.
+
+**End-goal link:** this lesson is the direct conceptual bridge to Phase 3.13 (debugging neural networks — vanishing/exploding gradients) and explains, in advance, why real training code is written with specific numerically-stable patterns (log-space probability computation, careful subtraction ordering, library-provided solvers instead of hand-rolled linear algebra) rather than the mathematically-equivalent-but-fragile naive versions.
+
+---
+
+## Milestone: Section 1.3 (Linear Algebra) — FULLY COMPLETE
+
+All 12 lessons closed: vectors → dot product → matrices → matrix-vector multiply → matrix-matrix multiply → eigenvalues → norms/distances → tensors/broadcasting → SVD → PCA/dimensionality reduction → linear systems → numerical stability. Every lesson was hand-built, numerically self-verified, and (from 1.3.9 onward) supplemented with real NumPy tool usage per the curriculum's "NumPy allowed, frameworks not" rule. Two topics (1.3.9 SVD, 1.3.12 numerical stability) each had substantial follow-up depth added after initial close, reflecting genuine engagement rather than surface-level completion.
+
+**Next: Phase 1.4 — Probability & Statistics**, starting with **1.4.1 — Mean, variance, standard deviation — by hand on a small dataset.**
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — this lesson (confirmed by direct content review earlier in this project) is now a genuinely comprehensive second-pass read, having covered vectors, matrices, dot products, rank, projection, Gram-Schmidt/QR, and low-rank decomposition (LoRA-relevant) — all territory now familiar from this section. Worth reading in full as a capstone to Section 1.3.
+
+---
