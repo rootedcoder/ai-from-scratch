@@ -527,3 +527,151 @@ def check_eigenvector(M, v):
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers matrix transformations per prior review.
 
 ---
+
+## 1.3.7 — Norms & Distances: L1, L2, Cosine Distance
+
+**Concept:** A norm measures a vector's magnitude/length. **L2 norm** = ordinary geometric (Euclidean) length: `√(sum of squares)` — the same `|a|`, `|b|` that appeared undefined in 1.3.2's geometric dot product formula. **L1 norm** = sum of absolute values ("Manhattan/taxicab distance" — grid-walking distance rather than straight-line). **Distance between vectors** = norm of their difference: `||a-b||`. **Cosine similarity** = `(a·b)/(||a||×||b||)` — a direct rearrangement of 1.3.2's `a·b=|a||b|cos(θ)` to isolate `cos(θ)`, meaning it measures *only* the angle between vectors, completely ignoring their length. Cosine distance = `1 - cosine_similarity`.
+
+**Why it matters for ML:** L2 is smooth, penalizes large values heavily (squaring), used in most loss functions and weight decay (3.8). L1 treats all distance equally, encourages sparsity (pushing weights to exactly zero) — relevant to feature selection (2.7) and LoRA (8.6). Cosine similarity is the standard tool for embedding/semantic comparison (8.2) precisely because it's length-invariant — two similar-meaning texts can have embeddings of different magnitudes for incidental reasons, but cosine similarity correctly measures direction alone.
+
+**Worked example:** `a=[3,4]`, `b=[1,2]` (reused from 1.3.2, where a·b=11). `||a||₂=5`, `||b||₂≈2.236`. `cosine_similarity ≈ 11/11.18 ≈ 0.984` — close to 1, confirming near-same direction.
+
+**Code:** `phase1-math/1_3_7_norms.py`
+```python
+def l1_norm(v):
+    return sum(abs(x) for x in v)
+
+def l2_norm(v):
+    return math.sqrt(sum(x**2 for x in v))
+
+def eucledian_distance(a, b):
+    diff = [a[i] - b[i] for i in range(len(a))]
+    return l2_norm(diff)
+
+def cosine_similarity(a, b):
+    return dot_product(a, b) / (l2_norm(a) * l2_norm(b))
+```
+
+**Practice results (all correct):**
+- `L1([3,4])=7`, `L2([3,4])=5.0`
+- `euclidean_distance([3,4],[1,2])≈2.828` — matches hand-check (`diff=[2,2]`, `√8≈2.828`)
+- `cosine_similarity([3,4],[1,2])≈0.9839` — matches worked example
+- **Key result:** `cosine_similarity([3,4],[6,8])=1.0` — `[6,8]` is `[3,4]` scaled 2x (same direction, different length). Confirms cosine similarity is entirely length-invariant, capturing direction only. Explicitly contrasted with raw dot product, which *would* be affected by length, making it a worse similarity metric for embeddings where magnitude carries no semantic meaning.
+
+**Gotcha:** none new mechanically — straightforward given the dot product foundation from 1.3.2.
+
+**End-goal link:** cosine similarity computed here is the exact metric used in Phase 8.2 (embeddings & vector search) and Phase 8.4 (RAG) to find semantically relevant documents/chunks — comparing a query embedding against stored document embeddings via this same formula.
+
+**Milestone:** Section 1.3 progress: vectors → dot product → matrices → matrix-vector → matrix-matrix → eigenvalues → norms/distances, seven lessons deep, all self-verified. Five lessons remain in 1.3 (tensors, SVD, dimensionality reduction, linear systems, numerical stability).
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — relevant, covers norms/distances per prior review.
+
+---
+
+## 1.3.8 — Tensor Operations: N-Dimensional Arrays, Shape, Axes, Broadcasting
+
+**Concept:** A tensor generalizes scalar (0D) → vector (1D) → matrix (2D) → N-D arrays. Shape is a tuple of any length; each position is an **axis**. Real ML data is almost always higher-dimensional: a batch of images is 4D `(batch, height, width, channels)`. **Broadcasting** lets operations combine tensors of different shapes by implicitly "stretching" the smaller one — already used informally in 1.3.1's `vector_scale` (a scalar stretched across a whole vector).
+
+**Why it matters for ML:** every real neural network operation works on tensors of exactly this kind. Broadcasting is how a single bias vector gets added to every row of a batch matrix without an explicit loop — the actual mechanism used constantly once NumPy/PyTorch are introduced.
+
+**Worked example:** `M=[[1,2,3],[4,5,6]]` (2×3), `b=[10,20,30]` (shape (3,), matching M's columns). Broadcasting `b` across every row: `M+b = [[11,22,33],[14,25,36]]`.
+
+**Code:** `phase1-math/1_3_8_tensors.py`
+```python
+def get_shape(tensor):
+    if not isinstance(tensor, list):
+        return ()
+    return (len(tensor),) + get_shape(tensor[0])
+
+def broadcast_add_bias(M, b):
+    return [[M[i][j] + b[j] for j in range(len(b))] for i in range(len(M))]
+```
+
+**Recursion deep-dive (significant portion of session):** requested and received a full manual trace of `get_shape` on a 2×2×2 nested list — walked through all 4 recursive calls (base case at the innermost plain number, then unwinding back up building `(2,)→(2,2)→(2,2,2)` via tuple concatenation). Initial self-description ("pushed to the end result") corrected to the accurate framing: each call *waits* for the one below it, then builds a slightly bigger tuple on the way back up — no appending/pushing occurs, it's return-value composition, not list mutation. Also clarified `isinstance()` (≈ JS `Array.isArray`), the required trailing comma for single-item tuples `(x,)`, and `+` as tuple concatenation (≈ JS `.concat()`) rather than arithmetic addition.
+
+**Bugs (both self-produced, both fixed within the session — real debugging reps):**
+1. Copy-paste slip: tested `print(get_shape(v))` a second time instead of `print(get_shape(M))` after redefining `M` — silently retested the wrong variable rather than erroring. Caught and corrected.
+2. `broadcast_add_bias` initially written as a **flat** comprehension with two chained `for` clauses (`[expr for j in ... for i in ...]`), which Python flattens into one list rather than nesting — produced `[11,14,22,25,33,36]` instead of `[[11,22,33],[14,25,36]]`. Fixed to a properly **nested** comprehension (inner brackets build one row, outer brackets collect rows), matching the same pattern already used in 1.3.5's `matrix_multiply`.
+
+**Practice results (all correct, after fixes):**
+- `get_shape([1,2,3]) = (3,)`, `get_shape` on a 3×2 matrix `= (3,2)`, `get_shape` on the 2×2×2 nested list `= (2,2,2)` — all matched hand predictions.
+- `broadcast_add_bias(M, [10,20,30]) = [[11,22,33],[14,25,36]]` ✓
+- Mismatch tests, generalizing the 1.3.4/1.3.5 pattern correctly: `b=[10,20]` (shorter than M's 3 columns) → silent incomplete result `[[11,22],[14,25]]` (M's third column never touched, since the loop is driven by `range(len(b))`). `b=[10,20,30,40]` (longer) → `IndexError`, since the loop tries `M[i][3]`, out of bounds for 3-column rows. Both correctly predicted before running.
+
+**Gotcha:** the same "which array's length drives the loop" failure-mode pattern has now recurred identically across three different functions (`dot_product`, `matrix_multiply`, `broadcast_add_bias`) — worth recognizing as one root cause (unchecked loop bounds), not three separate bugs. This is precisely why real broadcasting rules in NumPy/PyTorch check shape compatibility explicitly upfront rather than relying on loop bounds silently matching or not.
+
+**End-goal link:** tensor shape reasoning is the single most-used debugging skill in Phase 3+ — nearly every early neural network bug is a shape mismatch somewhere in a forward pass, and being able to trace *why* a particular mismatch fails silently vs. loudly (as practiced repeatedly this lesson) is directly transferable.
+
+**Milestone:** Section 1.3 — 8 of 12 lessons complete. Remaining: SVD (1.3.9), dimensionality reduction/PCA (1.3.10), linear systems (1.3.11), numerical stability (1.3.12).
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — check for tensor/broadcasting-specific coverage; not yet confirmed present in the reviewed content.
+
+---
+
+## 1.3.9 — Singular Value Decomposition (SVD): Concept + Why It Underlies Embeddings & Compression
+
+**Concept:** any matrix `M` decomposes as `M = U·Σ·Vᵀ`. `Σ` (diagonal, non-negative, sorted largest-to-smallest) holds the **singular values** — a ranked list of "how much information/importance each direction carries." `U` and `Vᵀ` are rotation-like matrices (orthonormal columns, related to but not identical to eigenvectors, 1.3.6) that reorient without adding/removing information. Plain-language framing used to rebuild the concept after initial difficulty: "any matrix's behavior = rotate, stretch along a few key directions by ranked amounts, rotate again." Not hand-derived — the actual algorithm is genuinely advanced numerical computation; used via `np.linalg.svd` as a tool, consistent with the curriculum's "NumPy allowed" rule. **First lesson using NumPy for real computation rather than pure from-scratch loops.**
+
+**Why it matters for ML:** because singular values are ranked by importance and often drop off fast, you can discard the small ones and reconstruct a good approximation from far less data — the core idea behind compression, and behind classical (pre-neural) word embeddings: a giant word-co-occurrence matrix can be compressed via SVD into a much smaller per-word vector, capturing most of the real signal in far fewer numbers. Modern neural embeddings are learned differently, but rest on the same underlying intuition.
+
+**Worked example:** `M=[[3,0],[0,1]]` (already axis-aligned, same shape as 1.3.6's stretching matrix) → singular values exactly `[3,1]`, matching the diagonal directly, with `U`/`Vt` both identity (no rotation needed since the matrix was already in its simplest form).
+
+**Code:** `phase1-math/1_3_9_svd.py` — line-by-line walkthrough given before running anything:
+```python
+import numpy as np
+M = np.array([[3, 0], [0, 1]])
+U, S, Vt = np.linalg.svd(M)
+reconstructed = U @ np.diag(S) @ Vt
+```
+Explained: `np.array()` converts a nested list into NumPy's fast array type (the "graduated" version of hand-built matrices); `np.linalg.svd()` returns three values unpacked via tuple-unpacking (same pattern as 1.2.4's `x, y = gradient_step(...)`); `@` is NumPy's matrix multiplication operator, doing what hand-built `matrix_multiply` (1.3.5) does; `np.diag(S)` converts the flat singular-value list into a proper diagonal matrix so it can be multiplied. Compression demo also introduced `.copy()` (explicit duplication, avoiding aliasing/reference-sharing bugs — same underlying issue as JS object/array reference semantics) and negative indexing (`S[-1]` = last element, a genuine Python convenience with no direct JS array equivalent).
+
+**Practice results:**
+- `M=[[3,0],[0,1]]` → singular values `[3,1]`, `U`/`Vt` both identity — confirmed.
+- `M2=[[4,0],[3,-5]]` → singular values `[6.3246, 3.1623]`; reconstruction matched `M2` within floating-point noise (~1e-15, same representation-error theme as earlier lessons).
+- Compression: zeroed the smaller singular value, reconstructed `approx=[[2,-2],[4,-4]]` vs real `M2=[[4,0],[3,-5]]` — a notably rough approximation, not close. Correctly predicted "won't be exact," though initial reasoning conflated dropping small-but-nonzero values with dropping already-zero ones. Corrected: compression only works well when there's a large gap between important and unimportant singular values; this toy 2×2 case had both values within 2x of each other (6.3 vs 3.2), too close for a good approximation — unlike real large matrices, where the value gap between dominant and negligible singular values is typically much larger, making the same technique highly effective at scale.
+
+**Gotcha:** the honest, non-idealized result (rough approximation, not a clean demo) is itself the most useful takeaway — compression quality depends entirely on how lopsided the singular value spectrum is, not on the technique alone.
+
+**End-goal link:** first real exposure to "use NumPy as a tool, not reimplement it" — previews the transition happening gradually through the rest of Phase 1 and fully arriving in Phase 2+. SVD-style compression ideas reappear directly in Phase 8.6 (LoRA, low-rank adaptation — literally built on this exact decomposition) and PCA (next lesson, 1.3.10).
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — confirmed by prior direct review to cover SVD/rank/projection content; genuinely relevant second-pass reading now.
+
+---
+
+**Addendum — how singular values are actually computed (follow-up question after initial lesson):** learner correctly noticed M1's singular values ([3,1]) matched its diagonal directly, but guessed M2's singular values ([6.32, 3.16]) might come from reading matrix entries directly (e.g. "[4,3]") — this guess was incorrect, and the real mechanism was walked through using only prior tools:
+
+**Real recipe:** singular values of `M` = `√(eigenvalues of MᵀM)`. `MᵀM` is guaranteed to have real, non-negative eigenvalues (unlike ordinary eigenvalues, 1.3.6, which can be negative) — this is precisely why singular values are always non-negative.
+
+**Verified by hand on M2=[[4,0],[3,-5]]:**
+- Transpose (1.3.3): `M2ᵀ=[[4,3],[0,-5]]`
+- `M2ᵀ·M2` (1.3.5, matrix multiply): `[[25,-15],[-15,25]]`
+- Eigenvalues of that result (not hand-derived, quadratic equation): `40` and `10`
+- `√40≈6.3246`, `√10≈3.1623` — exactly matches NumPy's SVD output.
+
+**Why M1 looked deceptively simple:** M1 is diagonal and symmetric, so `M1ᵀ=M1`, and `M1ᵀM1=M1²` just squares each diagonal entry directly (`9` and `1`). For a diagonal matrix, eigenvalues *are* the diagonal entries (same reasoning as 1.3.6's axis-aligned stretching matrix) — so the singular values fell right out to `3` and `1`, purely because M1 had no off-diagonal "cross-talk" between rows/columns. M2's nonzero off-diagonal `3` is exactly why it required the full `Mᵀ·M`→eigenvalues→square-root pipeline rather than a shortcut readout.
+
+**Key takeaway:** SVD isn't new math — it's a specific composition of tools already hand-built in this curriculum (transpose, matrix multiply, eigenvalues, square root). Nothing about it is a black box in principle, only the eigenvalue-solving step for larger matrices is deferred as "genuinely advanced, not hand-derived here."
+
+---
+
+**Addendum 2 — naming U/S/Vt and precisely what "rotation" means (second follow-up):**
+
+**Names:** `U` = left singular vectors (its columns). `Σ`/`S` = singular values. `V` = right singular vectors (`Vt` is `V` transposed, what NumPy actually returns).
+
+**Precision of the "rotation":** not vague or approximate — `V`'s columns are exactly the eigenvectors of `MᵀM`; `U`'s columns are exactly the eigenvectors of `MMᵀ`. Built from tools already known (eigenvectors, 1.3.6), constrained to be:
+1. **Unit length** (L2 norm = 1, per 1.3.7)
+2. **Mutually perpendicular** (pairwise dot product = 0, per 1.3.2)
+
+Columns satisfying both are called **orthonormal**; a square matrix of orthonormal columns is an **orthogonal matrix** — the formal term for "rotation-like": preserves all lengths and angles, adds zero new information, purely reorients. This is exactly why all "importance" information concentrates in `Σ` alone.
+
+**Verified directly against M2's real output**, not taken on faith:
+- `Vt=[[-0.7071,0.7071],[-0.7071,-0.7071]]` → since `Vt=Vᵀ`, each row of `Vt` is a column of `V`: `v1=[-0.7071,0.7071]`, `v2=[-0.7071,-0.7071]`.
+- Unit length check: `L2(v1)=√(0.5+0.5)=1` ✓
+- Perpendicularity check: `v1·v2 = 0.5-0.5 = 0` ✓
+- Eigenvector check: `(M2ᵀM2)·v1 ≈ [-28.28,28.28]`, and `40×v1 ≈ [-28.28,28.28]` — matches exactly, confirming v1 is the eigenvector for eigenvalue 40 (√40=6.3246, the largest singular value — consistent ordering by decreasing eigenvalue).
+
+**Honest subtlety:** eigenvectors/singular vectors are unique only up to sign (`v` and `-v` are equally valid). NumPy applies some internal consistent sign convention so `U·Σ·Vᵀ` correctly reconstructs `M`, but the *direction* (the line through space) is what's truly unique — which way counts as "positive" along that line isn't.
+
+**Summary answer to "how specific are the rotations":** fully and uniquely determined (up to sign) by the requirement of unit-length, mutually-perpendicular eigenvectors of `MᵀM`/`MMᵀ`, ordered by decreasing eigenvalue — nothing arbitrary about it, every piece traces back to tools already hand-built earlier in section 1.3.
+
+---
