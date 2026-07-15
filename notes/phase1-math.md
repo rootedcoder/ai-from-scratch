@@ -675,3 +675,70 @@ Columns satisfying both are called **orthonormal**; a square matrix of orthonorm
 **Summary answer to "how specific are the rotations":** fully and uniquely determined (up to sign) by the requirement of unit-length, mutually-perpendicular eigenvectors of `MᵀM`/`MMᵀ`, ordered by decreasing eigenvalue — nothing arbitrary about it, every piece traces back to tools already hand-built earlier in section 1.3.
 
 ---
+
+## 1.3.10 — Dimensionality Reduction: PCA from Scratch, t-SNE/UMAP Concept
+
+**Concept:** PCA finds the small number of directions that capture the most variation in high-dimensional data, allowing compression/visualization with minimal information loss. Built almost entirely from tools already hand-built: eigenvectors (1.3.6) of the data's **covariance matrix** (a `MᵀM`-shaped construction, same pattern as 1.3.9's SVD addendum) reveal the directions of maximum spread — the eigenvector with the largest eigenvalue is the **first principal component**. PCA and SVD are deeply related; real libraries typically compute PCA via SVD internally for efficiency/stability.
+
+**Why it matters for ML:** compressing high-dimensional data (weights, embeddings) down to a manageable, interpretable number of dimensions while preserving most real structure — same underlying idea as 1.3.9's compression story, now applied to datasets rather than single matrices.
+
+**Worked example:** 4 points nearly on a line: `[[2,3],[3,4],[4,5],[5,6]]`. Expected: one large eigenvalue (along the [1,1] line direction), one near-zero eigenvalue (perpendicular, almost no spread that way).
+
+**Code:** `phase1-math/1_3_10_pca.py` — full line-by-line walkthrough given before running, covering: `.mean(axis=0)` (axis vocabulary from 1.3.8, now used for real — averaging down columns); `data - mean` as automatic broadcasting (1.3.8) rather than a manual loop; `centered.T @ centered / (n-1)` as the covariance matrix (the `MᵀM` pattern from 1.3.9, plus Bessel's correction, deferred to Phase 1.4); `np.linalg.eig()` as the "find" counterpart to 1.3.6's "check" function (`check_eigenvector`); `np.argsort(...)[::-1]` for descending-order index sorting (argsort returns sorting *indices*, not sorted values; `[::-1]` reverses a sequence); `eigenvectors[:, order[:n_components]]` as NumPy's 2D "all rows, selected columns" indexing.
+```python
+def pca(data, n_components):
+    data = np.array(data, dtype=float)
+    mean = data.mean(axis=0)
+    centered = data - mean
+    cov_matrix = (centered.T @ centered) / (len(data) - 1)
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+    order = np.argsort(eigenvalues)[::-1]
+    top_components = eigenvectors[:, order[:n_components]]
+    reduced = centered @ top_components
+    return reduced, eigenvalues[order]
+```
+
+**Practice results (all correct, all predicted before running):**
+- Eigenvalues: `[3.333, ~0]` (`-4.44e-16`, essentially zero) — massive gap, exactly as predicted, confirming the data is secretly near-1-dimensional.
+- Dominant eigenvector: `[0.7071, 0.7071]` — matches the predicted `[1,1]` line direction exactly.
+- Reduced (1D) values: `[-2.1213, -0.7071, 0.7071, 2.1213]` — every consecutive gap exactly `1.4142` (`=√2`), correctly matching the length of each `[1,1]` step in the original evenly-spaced data. PCA preserved the even spacing when projecting down to one dimension.
+- New gotcha encountered: `np.linalg.eig` returns complex-typed output (`+0.j` suffix) even when eigenvalues are guaranteed real (as they always are for symmetric covariance matrices) — NumPy defaults to complex dtype since it can't assume realness for arbitrary matrices in general. Not an error, just a type quirk to recognize.
+
+**Conceptual question (PCA vs. t-SNE/UMAP) — needed correction:** initial answer ("PCA for straightforward tasks, t-SNE/UMAP when there are multiple truths") was vague and didn't capture the real distinction. Corrected framing: **PCA preserves global/linear structure** — best when the meaningful relationships in data really are roughly linear, good for compression and gives mathematically interpretable axes. **t-SNE/UMAP preserve local neighborhood relationships** ("which points were near which"), even at the cost of distorting overall/global shape — better suited for visualizing genuinely non-linear clustering, e.g. an embedding space where semantically similar code snippets should appear close together even if their true high-dimensional relationship isn't a straight line. Connected to the learner's own Jarvis-platform goal: PCA fits compression-style questions (e.g. "how does this weight matrix vary along its dominant axes," echoing 1.3.9); t-SNE/UMAP fit exploratory visualization of a coding-assistant's embedding space.
+
+**Gotcha:** none new mechanically beyond the complex-dtype quirk noted above.
+
+**End-goal link:** PCA (and dimensionality reduction generally) reappears throughout the curriculum — visualizing high-dimensional embeddings (5B.3, 8.2), compressing model representations, and conceptually anticipating why some directions in weight-space matter far more than others during training (a recurring theme from 1.3.6's eigenvalues through 1.3.9's SVD to here).
+
+**Milestone:** Section 1.3 — 10 of 12 lessons complete. Remaining: linear systems (1.3.11), numerical stability (1.3.12) — the latter directly follows up on floating-point themes that have recurred since 1.2.1.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — confirmed by prior review to cover dimensionality reduction/projection content directly.
+
+---
+
+## 1.3.11 — Linear Systems: Solving Ax = b
+
+**Concept:** Generalizes 1.1.1 (solve one equation, one unknown) to many equations, many unknowns simultaneously, expressed compactly as `A·x = b` (A = coefficient matrix, x = unknowns vector, b = results vector) — a direct application of matrix-vector multiplication (1.3.4). If `A` has an inverse `A⁻¹` (satisfying `A⁻¹A=I`, the identity matrix from the earlier eigenvalue-clarification question), then `x = A⁻¹b` — the matrix analog of dividing both sides of `2x=8` by 2.
+
+**Why it matters for ML:** solving `Ax=b` is a core building block inside other algorithms — linear regression (2.2) has a closed-form solution built on exactly this; Newton's method (a gradient-descent alternative) also reduces to repeatedly solving linear systems. Also introduces the well-posed vs. ill-posed distinction, setting up 1.3.12 directly.
+
+**Worked example:** `A=[[2,1],[1,-1]]`, `b=[11,1]`. `det(A)=(2)(-1)-(1)(1)=-3`. Using the 2×2 inverse formula, `A⁻¹=[[1/3,1/3],[1/3,-2/3]]`, giving `x=A⁻¹b=[4,3]`. Verified by substitution: `2(4)+3=11` ✓, `4-3=1` ✓.
+
+**Code:** `phase1-math/1_3_11_linear_systems.py` — used `np.linalg.solve(A,b)` rather than the manual inverse-formula approach, flagged as the numerically better real-world method (previews 1.3.12).
+
+**Practice results (all correct):**
+- `A=[[2,1],[1,-1]]`,`b=[11,1]` → `[4,3]` ✓, matches hand-worked example.
+- Own example: `A=[[3,2],[1,-1]]`,`b=[12,1]` → `[2.8,1.8]`, verified by substitution into both original equations (`3(2.8)+2(1.8)=12` ✓, `2.8-1.8=1` ✓).
+- `A=[[2,4],[1,2]]`,`b=[10,5]`: correctly computed `det(A)=(2)(2)-(4)(1)=0` and predicted no inverse exists before running. Confirmed with `LinAlgError: Singular matrix`. Initial reasoning ("1/0 crashes it during inverse computation") was directionally right but refined: `np.linalg.solve` doesn't literally compute a naive inverse internally, but hits the same underlying mathematical wall regardless of algorithm — `det=0` defines a **singular matrix** (new term), geometrically explained here as the second row (`[1,2]`) being an exact scalar multiple of the first (`[2,4]`) — the two equations describe the same line rather than two independent constraints, so the system has either infinitely many or zero solutions, never exactly one. Connected back to 1.3.6: singular matrices always have `0` as one of their eigenvalues (they collapse some direction of space entirely).
+
+**Gotcha:** none new mechanically — the real depth was in precisely correcting *why* solve() fails (algorithm-independent mathematical fact, not merely "some internal division by zero").
+
+**End-goal link:** solving linear systems efficiently and stably is the literal computational core of closed-form linear regression (Phase 2.2) and appears repeatedly as a subroutine inside more advanced optimization methods throughout later phases.
+
+**Addendum — t-SNE/UMAP depth check (follow-up after 1.3.10, before starting 1.3.11):** confirmed the shallow treatment of t-SNE/UMAP was intentional, per the curriculum's own distinction in wording ("PCA from scratch" vs. "t-SNE/UMAP concept"). Extra intuition given: t-SNE computes neighbor probabilities in both high-D and low-D space, then uses gradient descent (same core mechanism as 1.2.4) to minimize the KL divergence (previewed, formally covered in Phase 1.5.2) between them — different loss function, same underlying optimization mechanism already known. UMAP is topology-based (out of scope for this curriculum), generally faster, and tends to better preserve global structure — the more commonly reached-for default of the two in current practice. Not formally logged as its own topic; folded in here as context.
+
+**Milestone:** Section 1.3 — 11 of 12 lessons complete. Only numerical stability (1.3.12) remains to close out Linear Algebra entirely — directly continuing the floating-point precision theme that has recurred since 1.2.1.
+
+→ repo: `phases/01-math-foundations/01-linear-algebra-intuition` — check for linear-systems-specific coverage; not yet confirmed present in the reviewed content.
+
+---
