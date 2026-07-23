@@ -856,3 +856,35 @@ def combinations(n, k):
 → repo: not yet checked for this phase — verify against catalog when convenient.
 
 ---
+
+## 1.4.3 — Bayes' Theorem: Worked Example, Why It's Foundational
+
+**Concept:** `P(A|B) = P(B|A)×P(A)/P(B)` — lets you compute a hard-to-measure conditional probability (`P(A|B)`) from an easier-to-measure reverse one (`P(B|A)`). `P(A)` is the **prior** (belief before evidence); `P(A|B)` is the **posterior** (updated belief after evidence).
+
+**Why it matters for ML:** foundation of Naive Bayes (2.12, builds on 1.4.2's independence assumption) and Bayesian thinking generally (prior → evidence → posterior), reappearing in RL (5E) and underlying how to correctly interpret any model's confidence score.
+
+**Worked example (classic medical test):** disease prevalence 1%, test 95% sensitive, 5% false-positive rate. `P(B) = 0.95×0.01 + 0.05×0.99 = 0.059`. `P(disease|positive) = 0.95×0.01/0.059 ≈ 0.161` — dramatically lower than the naive "95%" intuition, because false positives from the large healthy population outnumber true positives from the small sick population.
+
+**Code:** `phase1-math/1_4_3_bayes.py`
+```python
+def bayes_theorem(p_a, p_b_given_a, p_b_given_not_a):
+    p_not_a = 1 - p_a
+    p_b = p_b_given_a * p_a + p_b_given_not_a * p_not_a
+    p_a_given_b = (p_b_given_a * p_a) / p_b
+    return p_a_given_b
+```
+
+**Practice results:**
+- Original example → `0.161` ✓
+- `p_a=0.5` (common disease, same test) → exactly `0.95`. Explained: with 50/50 prevalence and symmetric error rates (both 5%), the prior perfectly cancels out of the formula, collapsing the posterior to the test's raw accuracy. Confirms: the same test becomes far more trustworthy as the condition being tested for becomes more common.
+- Worse-test experiment initially changed two parameters simultaneously (sensitivity 0.6 AND false-positive rate 0.4 together) rather than isolating one — result `0.0149`. Clarifying question asked and resolved (see below). Rerun with only sensitivity changed (0.6, false-positive rate unchanged at 0.05) → `0.108` — correctly lower than 0.161, but a noticeably smaller drop than the combined-effect run, correctly distinguishing "one property got worse" from "both properties got worse."
+
+**Clarifying question, resolved (important conceptual fix):** "why isn't P(B|not A) just 1-P(B|A)?" Resolved by distinguishing two different rules that look superficially similar: `P(B|A) + P(not B|A) = 1` genuinely holds (within one fixed population — sick people either test positive or negative, covering all outcomes). But `P(B|A)` and `P(B|not A)` describe **two separate populations** (sick vs. healthy) with independently-measured, unrelated error rates — no subtraction relationship connects them. A test's sensitivity and false-positive rate are set by how it actually behaves in each group, measured separately; nothing forces one to be `1-` the other.
+
+**Gotcha:** conflating "complement within one condition" (`P(B|A)+P(not B|A)=1`, always true) with "relationship between two different conditions" (`P(B|A)` vs `P(B|not A)`, no fixed relationship) — a very natural and common point of confusion, worth remembering precisely.
+
+**End-goal link:** Bayes' theorem is the direct mathematical foundation of Naive Bayes classifiers (2.12) and the general Bayesian framing (prior/evidence/posterior) that reappears throughout RL and any probabilistic reasoning about model confidence.
+
+→ repo: not yet checked for this phase — verify against catalog when convenient.
+
+---
