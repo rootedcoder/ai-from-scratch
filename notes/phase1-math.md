@@ -412,4 +412,20 @@ Concept + formula + results per completed topic. Code lives in `phase1-math/*.py
 
 ---
 
-*Next: 1.4.6 — Sampling methods, Monte Carlo basics.*
+## 1.4.6 — Sampling Methods: Monte Carlo Basics
+
+**Concept:** When an exact answer is too hard/slow to compute directly, simulate the process many times randomly and average the results as an approximation. More samples → better, more consistent estimate.
+
+**Formula:** π estimation via random sampling: `π ≈ 4 × (fraction of random points inside a unit circle inscribed in a 2×2 square)`, using the L2-norm-based check `x²+y² ≤ 1` (1.3.7) for "inside the circle."
+
+**Worked example:** `np.random.uniform(-1,1,n)` generates uniformly random points (every value in range equally likely, unlike 1.4.4's Gaussian); boolean array comparison + `.sum()` counts points inside the circle (True=1, False=0 when summed).
+
+**Practice results:** n=1000 and n=100000 both landed close to true π (3.14, 3.14) in this particular run — the small-sample case somewhat lucky. Three repeated n=1000 calls (no fixed seed) gave genuinely different results (3.168, 3.148, 3.116) — directly demonstrated sampling variance at a fixed sample size, and that variance would shrink with larger n (reinforces 1.4.4's convergence theme). Batch-size/training connection needed to be built from scratch (initial "not sure") — resolved: batch size plays the same role as n_samples; larger batches → gradient estimates closer to the "true" gradient, less run-to-run variance (mirrors 100000 vs 1000-sample stability); smaller batches → noisier gradient estimates (mirrors the 3.168/3.148/3.116 spread). Noted as a preview: gradient noise from smaller batches can help escape shallow local minima (1.2.5), so "bigger is strictly better" isn't the complete picture — deferred to Phase 3.
+
+**Gotcha:** none new mechanically — the real lesson was internalizing sampling variance by directly observing it across repeated runs, not just being told it exists.
+
+**End-goal link:** RL value estimation (5E.3, literally titled "Monte Carlo methods"), diffusion model sampling (5D.5), and every training step's batch-based gradient estimate are all structurally this same idea — turn an intractable exact computation into a tractable random-sampling-and-averaging one.
+
+---
+
+*Next: 1.4.7 — Statistics for ML — bias, variance, confidence intervals, hypothesis testing.*
