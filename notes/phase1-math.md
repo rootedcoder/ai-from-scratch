@@ -784,3 +784,75 @@ All 12 lessons closed: vectors → dot product → matrices → matrix-vector mu
 → repo: `phases/01-math-foundations/01-linear-algebra-intuition` — this lesson (confirmed by direct content review earlier in this project) is now a genuinely comprehensive second-pass read, having covered vectors, matrices, dot products, rank, projection, Gram-Schmidt/QR, and low-rank decomposition (LoRA-relevant) — all territory now familiar from this section. Worth reading in full as a capstone to Section 1.3.
 
 ---
+
+# Phase 1.4 — Probability & Statistics
+
+## 1.4.1 — Mean, Variance, Standard Deviation: By Hand on a Small Dataset
+
+**Concept:** Mean = center of data (already used unnamed in 1.3.10's `data.mean(axis=0)`). Variance = average squared distance from the mean (squaring prevents positive/negative distances from cancelling — same reasoning as L2 norm, 1.3.7). Standard deviation = `√variance`, bringing units back to the original scale (variance of dollar values is in "dollars²," std dev is back in plain dollars).
+
+**Why it matters for ML:** the covariance matrix used in 1.3.10's PCA is this exact idea generalized to multiple dimensions/features jointly. Standard deviation is central to feature normalization (Phase 2, near-universal preprocessing), weight initialization (Phase 3.9 — poorly chosen std dev causes training instability, connecting to 1.3.12), and noise control in diffusion models (Phase 5D.5).
+
+**Worked example:** `[2,4,4,4,5,5,7,9]` → mean=5, diffs=[-3,-1,-1,-1,0,0,2,4], squared=[9,1,1,1,0,0,4,16], sum=32, variance=32/8=4, std=√4=2.
+
+**Code:** `phase1-math/1_4_1_mean_variance.py`
+```python
+def mean(data):
+    return sum(data) / len(data)
+
+def variance(data):
+    m = mean(data)
+    squared_diffs = [(x - m)**2 for x in data]
+    return sum(squared_diffs) / len(data)
+
+def std_dev(data):
+    return variance(data) ** 0.5
+```
+Noted: `** 0.5` is the same operation as `math.sqrt`, via the fractional-exponent connection to the power rule (1.2.2).
+
+**Practice results (all correct):**
+- `[2,4,4,4,5,5,7,9]` → mean=5.0, variance=4.0, std=2.0 — matches worked example.
+- `[3,4,5,6,7]` (same mean, tighter spread) → variance=2.0, std≈1.414 — correctly smaller than the first dataset's variance, confirming "tighter clustering around the same center → lower variance."
+- `[5,5,5,5,5]` (identical values) → variance=0.0, std=0.0 — correctly predicted before running: every point's distance from the mean is exactly 0, so the average of all-zero squared distances is 0.
+
+**Gotcha:** none new — clean, direct application of prior lessons (L2-style squared distance, fractional exponents).
+
+**End-goal link:** zero variance is a real, meaningful signal — a feature or neuron output that never varies carries no information a model can learn from, a concept that recurs when diagnosing "dead" neurons or uninformative features later in the curriculum.
+
+→ repo: not yet checked for this phase — verify against catalog when convenient.
+
+---
+
+## 1.4.2 — Probability Basics: Events, Independence, Combinations
+
+**Concept:** Probability = `favorable outcomes / total outcomes`, range [0,1]. An event is the specific thing being measured. **Independence**: two events are independent if one tells you nothing about the other; for independent events, `P(A and B) = P(A) × P(B)`. **Combinations**: `C(n,k) = n!/(k!(n-k)!)` — number of distinct ways to choose k items from n, order irrelevant.
+
+**Why it matters for ML:** Naive Bayes (2.12) is literally named after assuming feature independence. Combinations matter for counting configurations/search spaces (e.g. possible move sequences in a game — directly relevant to game-generation goals). Probability underlies classifier outputs directly — a network's final classification output is literally a probability distribution.
+
+**Worked example:** `P(rolling a 4 on a d6)=1/6`. `P(heads,heads)=0.5×0.5=0.25`. `C(4,2)=4!/(2!2!)=6`, verified against the hand-listed pairs `{AB,AC,AD,BC,BD,CD}`.
+
+**Code:** `phase1-math/1_4_2_probability.py`
+```python
+def probability(favorable, total):
+    return favorable / total
+
+def independent_and(p_a, p_b):
+    return p_a * p_b
+
+def combinations(n, k):
+    return math.factorial(n) / (math.factorial(k) * math.factorial(n - k))
+```
+
+**Practice results (all correct):**
+- `P(rolling a 4) ≈ 0.1667` ✓
+- `P(heads,heads)=0.25` ✓; three flips computed via recursive reuse (`independent_and(0.5, independent_and(0.5,0.5))` rather than new code) → `0.125` ✓. Noted the halving pattern (0.5→0.25→0.125→...) as structurally the same shrink-toward-zero shape as 1.3.12's underflow demo — enough independent multiplications and this hits the same floating-point floor.
+- `C(4,2)=6.0` ✓, `C(6,3)=20.0` ✓ — correctly predicted the larger pool (6 vs 4) yields more combinations.
+- `C(n,n)`: correctly predicted `=1` before running (only one way to "choose everything," regardless of n) — confirmed with `C(5,5)=1.0`.
+
+**Gotcha:** none new — direct, mechanically clean application, main value was recognizing the underflow connection to 1.3.12.
+
+**End-goal link:** independence assumptions and probability multiplication recur throughout classical ML (2.12 Naive Bayes) and directly motivate why classifier training uses log-probabilities (cross-entropy loss, upcoming in 2.3/3.4) rather than raw probability products — the exact underflow risk just observed in miniature here.
+
+→ repo: not yet checked for this phase — verify against catalog when convenient.
+
+---
