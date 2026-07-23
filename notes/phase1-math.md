@@ -396,4 +396,20 @@ Concept + formula + results per completed topic. Code lives in `phase1-math/*.py
 
 ---
 
-*Next: 1.4.5 — Expected value.*
+## 1.4.5 — Expected Value
+
+**Concept:** Weighted average of all possible outcomes, weighted by their probability — "the long-run average if this process repeated many times." Mean (1.4.1) is the special case where observed data points get equal weight; expected value generalizes to theoretical probabilities over all possible outcomes.
+
+**Formula:** `E[X] = Σ(xi × P(xi))`. Sanity check: probabilities must sum to exactly 1.
+
+**Worked example:** Fair die: `E[X] = (1+2+3+4+5+6)/6 = 3.5` (not a possible single outcome — describes the long-run average only). Game (win $10 at 0.2, win $2 at 0.5, lose $5 at 0.3): `E[X] = 2+1-1.5 = 1.5`.
+
+**Practice results:** Real, instructive bug: initial fair-die probabilities were `[1/6,2/6,3/6,4/6,5/6,6/6]` (increasing, summing to 3.5 instead of 1) rather than equal `1/6` each — self-debugged with print statements, caught via the "probabilities must sum to 1" sanity check. Corrected → 3.5 ✓. Game example verified → 1.5 ✓. Modified game (loss probability raised to 0.5) → -0.7, correctly predicted to flip negative. Explained in own words why weighting the worst outcome more heavily pulls expected value down; refined to the precise mechanic — a bigger weight on the negative term and smaller weights on the positive terms both push the weighted sum down simultaneously.
+
+**Gotcha:** always sanity-check that a probability list sums to 1 before trusting any downstream calculation — an easy, high-value habit.
+
+**End-goal link:** batch loss averages during training are empirical estimates of the *true* expected loss across the full real-world input distribution — connects directly to 1.4.4's sampling theme (finite samples approximate, but don't exactly equal, the true underlying value).
+
+---
+
+*Next: 1.4.6 — Sampling methods, Monte Carlo basics.*

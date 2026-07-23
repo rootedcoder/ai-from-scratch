@@ -181,7 +181,7 @@ _Every concept explained with real numbers before any code._
 - [x] **1.4.2** Probability basics — events, independence, combinations
 - [x] **1.4.3** Bayes' theorem — worked example, why it's foundational
 - [x] **1.4.4** Distributions — Gaussian/normal (shows up in weight init, noise, diffusion)
-- [ ] **1.4.5** Expected value — definition + worked example
+- [x] **1.4.5** Expected value — definition + worked example
 - [ ] **1.4.6** Sampling methods — Monte Carlo basics, why we sample instead of compute exactly
 - [ ] **1.4.7** Statistics for ML — bias, variance, confidence intervals, hypothesis testing
       → repo: `06-probability-and-distributions`, `07-bayes-theorem`, `15-statistics-for-ml`, `16-sampling-methods`
