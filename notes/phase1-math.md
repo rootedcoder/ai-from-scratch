@@ -428,4 +428,22 @@ Concept + formula + results per completed topic. Code lives in `phase1-math/*.py
 
 ---
 
-*Next: 1.4.7 — Statistics for ML — bias, variance, confidence intervals, hypothesis testing.*
+## 1.4.7 — Statistics for ML: Bias, Variance, Confidence Intervals, Hypothesis Testing
+
+**Concept:** **Bias** = is an estimate systematically wrong in one direction (consistently over/under, averaged over infinite samples)? **Variance** (statistical sense) = how much does an estimate wobble from sample to sample — directly what was observed in 1.4.6's three different π estimates. **Confidence interval** = a range likely to contain the true value, narrowing as sample size grows. **Hypothesis testing** = formal procedure for asking "is this observed effect real, or plausibly just noise?", via a null hypothesis (the "nothing special happening" default assumption).
+
+**Formula:** Approximate 95% CI for a Gaussian-distributed mean: `CI = sample_mean ± 1.96 × (sample_std / √n)`. The `std/√n` term is the **standard error** — shrinks as n grows, which is why CIs narrow with more samples.
+
+**Worked example:** n=1000, mean≈0.019, std≈0.979 (reusing 1.4.4's numbers): standard_error≈0.031, CI≈[-0.042, 0.079] — correctly contains the true mean, 0.
+
+**Practice results:** Verified n=1000 CI contains 0. Verified the √n width-scaling prediction numerically: n=100→10000 (100x samples) gave a width ratio ≈9.55 (predicted 10x, since √100=10); n=100→1000 (10x samples) gave ratio ≈3.10 (predicted √10≈3.16x) — both close matches, minor deviation attributable to different underlying random datasets rather than the formula being wrong. Correctly diagnosed 1.4.6's three π estimates (3.168, 3.148, 3.116) as demonstrating **variance**, not bias — reasoned precisely that the errors were scattered on both sides of the true value (+0.026, +0.006, -0.026) rather than consistently one-directional, which is what genuine bias would look like instead.
+
+**Gotcha:** none new mechanically — the real payoff was correctly distinguishing bias from variance using a concrete example already lived through, rather than abstract definitions alone.
+
+**End-goal link:** direct, explicit setup for Phase 2.5 (overfitting vs. underfitting) — underfit models show high bias (systematically, predictably wrong regardless of training data), overfit models show high variance (wildly sensitive to which specific training data they saw) — the exact same bias/variance distinction just practiced here, applied to model behavior instead of a π estimate. Also foundational to honestly reporting model performance (accuracy ± confidence interval, not just a bare number) and to correctly interpreting whether an observed improvement between two models is real or just sampling noise.
+
+**MILESTONE: Section 1.4 (Probability & Statistics) — FULLY COMPLETE.** All 7 lessons: mean/variance/std → probability/independence/combinations → Bayes' theorem → Gaussian distribution → expected value → Monte Carlo sampling → bias/variance/confidence intervals. Every lesson hand-built or NumPy-tool-verified, with real, instructive bugs caught and fixed along the way (probability-sum-to-1 sanity check, seed/sample-count confusion).
+
+---
+
+*Next: Section 1.5 — Information Theory, starting with 1.5.1 — Entropy.*
